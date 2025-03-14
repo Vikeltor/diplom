@@ -1,0 +1,87 @@
+#
+sudo useradd --no-create-home --shell /bin/false prometheus
+#wget https://github.com/prometheus/prometheus/releases/download/v2.45.0/prometheus-2.45.0.linux-386.tar.gz
+wget https://github.com/prometheus/prometheus/releases/download/v2.45.0/prometheus-2.45.0.linux-amd64.tar.gz
+#tar xvfz prometheus-2.45.0.linux-386.tar.gz
+tar xvfz prometheus-2.45.0.linux-amd64.tar.gz
+#cd prometheus-2.45.0.linux-386/
+cd prometheus-2.45.0.linux-amd64/
+sudo mkdir /etc/prometheus
+sudo mkdir /var/lib/prometheus
+sudo cp ./prometheus promtool /usr/local/bin/
+sudo cp -R ./console_libraries /etc/prometheus
+sudo cp -R ./consoles /etc/prometheus
+sudo cp ./prometheus.yml /etc/prometheus
+sudo chown -R prometheus:prometheus /etc/prometheus /var/lib/prometheus
+sudo chown prometheus:prometheus /usr/local/bin/prometheus
+sudo chown prometheus:prometheus /usr/local/bin/promtool
+/usr/local/bin/prometheus --config.file /etc/prometheus/prometheus.yml --storage.tsdb.path /var/lib/prometheus/ --web.console.templates=/etc/prometheus/consoles --web.console.libraries=/etc/prometheus/console_libraries
+#sudo nano /etc/systemd/system/prometheus.service #Содержимое файла ниже в блоке кода
+
+sudo systemctl enable prometheus.service
+sudo systemctl start prometheus.service
+sudo systemctl status prometheus.service
+
+
+sudo journalctl -xe
+######################################################
+#
+#wget https://github.com/prometheus/node_exporter/releases/download/v1.6.0/node_exporter-1.6.0.linux-amd64.tar.gz
+wget https://github.com/prometheus/node_exporter/releases/download/v1.6.1/node_exporter-1.6.1.linux-amd64.tar.gz
+#wget https://github.com/prometheus/node_exporter/releases/download/v1.6.0/node_exporter-1.6.0.linux-386.tar.gz
+tar xvfz node_exporter-1.6.1.linux-amd64.tar.gz
+cd cd node_exporter-1.6.1.linux-amd64/
+./node_exporter  #Проверяем доступность : http://127.0.0.1:9100/metrics
+sudo mkdir /etc/prometheus/node-exporter
+sudo cp ./* /etc/prometheus/node-exporter
+chown -R prometheus:prometheus /etc/prometheus/node-exporter/
+sudo nano /etc/systemd/system/node-exporter.service #Содержимое файла ниже в блоке кода
+sudo systemctl enable node-exporter
+sudo systemctl start node-exporter
+sudo systemctl status node-exporter
+
+
+sudo journalctl -xe
+######################################################
+#
+Доступ к web интерфейсу prometheus:
+<Внешний_IP>:9090
+
+Доступ к web интерфейсу node-exporter:
+<Внешний_IP>:9100
+
+Доступность prometheus-nginxlog-exporter:
+<Внешний_IP>:4040
+404 page not found
+curl http://<Внешний_IP>:4040/metrics
+
+######################################################
+
+sudo systemctl daemon-reload
+
+./prometheus-nginxlog-exporter -config-file /path/to/config.hcl -verify-config
+/usr/sbin/prometheus-nginxlog-exporter -config-file /etc/prometheus-nginxlog-exporter.hcl
+
+Доступ к лог-файлам nginx /var/log/nginx/access.log /var/log/nginx/error.log:
+-rw-r----- 1 www-data adm 349 Jul 25 11:24 access.log
+-rw-r----- 1 www-data adm  76 Jul 25 11:24 error.log
+
+sudo usermod -aG adm yc-user #Для yc-user сработал после перлогинивания; sudo gpasswd -d yc-user adm #Удалаем 
+sudo usermod -aG adm root #Процесс prometheus-nginxlog-exporter запукается от имени root но как перелогинеться? Или создать нового пользователя и запустить службу от его имени? 
+или chmod o+r /var/log/nginx/*.log
+
+
+for each in {1..10}; do curl http://<Внешний_IP ; done
+
+
+#####################################################
+
+sudo mkdir /var/log/prometheus/
+sudo chown prometheus:prometheus /var/log/prometheus/
+
+#Как лог prometheus из терминала (std_out) вывести в файл
+/etc/prometheus/prometheus > /var/log/prometheus/prometheus.log #Перенаправление не работает
+/etc/prometheus/prometheus |sudo tee -a /var/log/prometheus/prometheus.log  #Так же не работает!
+
+/usr/local/bin/prometheus --config.file /etc/prometheus/prometheus.yml --storage.tsdb.path /var/lib/prometheus/ --log.level info --log.format logfmt --web.console.templates=/etc/prometheus/consoles --web.console.libraries=/etc/prometheus/console_libraries | sudo tee -a /var/log/prometheus/prometheus.log  # лог не создается!
+

@@ -1,0 +1,2069 @@
+{
+  "version": 4,
+  "terraform_version": "1.10.3",
+  "serial": 172,
+  "lineage": "d10f06ec-31f5-c25c-5060-4a49b1dbfc0f",
+  "outputs": {},
+  "resources": [
+    {
+      "mode": "managed",
+      "type": "yandex_alb_backend_group",
+      "name": "my_backend_group",
+      "provider": "provider[\"registry.terraform.io/yandex-cloud/yandex\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "created_at": "2024-12-27T19:40:43Z",
+            "description": "ALB:Группа бэкендов",
+            "folder_id": "b1g3smh02jd80g1ltb4k",
+            "grpc_backend": [],
+            "http_backend": [
+              {
+                "healthcheck": [
+                  {
+                    "grpc_healthcheck": [],
+                    "healthcheck_port": 0,
+                    "healthy_threshold": 10,
+                    "http_healthcheck": [
+                      {
+                        "expected_statuses": null,
+                        "host": "",
+                        "http2": false,
+                        "path": "/"
+                      }
+                    ],
+                    "interval": "2s",
+                    "interval_jitter_percent": 0,
+                    "stream_healthcheck": [],
+                    "timeout": "10s",
+                    "unhealthy_threshold": 15
+                  }
+                ],
+                "http2": false,
+                "load_balancing_config": [
+                  {
+                    "locality_aware_routing_percent": 0,
+                    "mode": "ROUND_ROBIN",
+                    "panic_threshold": 90,
+                    "strict_locality": false
+                  }
+                ],
+                "name": "project-backend",
+                "port": 80,
+                "storage_bucket": "",
+                "target_group_ids": [
+                  "ds7sd4rfep7gbams4urc"
+                ],
+                "tls": [],
+                "weight": 1
+              }
+            ],
+            "id": "ds7knve1dvgf5r74cvpg",
+            "labels": null,
+            "name": "project-web-backend-group",
+            "session_affinity": [],
+            "stream_backend": [],
+            "timeouts": null
+          },
+          "sensitive_attributes": [],
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjozMDAwMDAwMDAwMDAsImRlbGV0ZSI6MzAwMDAwMDAwMDAwLCJ1cGRhdGUiOjMwMDAwMDAwMDAwMH19",
+          "dependencies": [
+            "yandex_alb_target_group.my_target_group",
+            "yandex_compute_disk.disk_grafana",
+            "yandex_compute_disk.disk_web_1",
+            "yandex_compute_disk.disk_web_2",
+            "yandex_compute_instance.vm_grafana",
+            "yandex_compute_instance.vm_web_1",
+            "yandex_compute_instance.vm_web_2",
+            "yandex_vpc_network.default",
+            "yandex_vpc_security_group.sg_web",
+            "yandex_vpc_subnet.subnet_a",
+            "yandex_vpc_subnet.subnet_b"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "yandex_alb_http_router",
+      "name": "my_http_router",
+      "provider": "provider[\"registry.terraform.io/yandex-cloud/yandex\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "created_at": "2024-12-27T19:40:25Z",
+            "description": "ALB:HTTP роутер",
+            "folder_id": "b1g3smh02jd80g1ltb4k",
+            "id": "ds74nv640ntuabfkv9fo",
+            "labels": null,
+            "name": "project-http-router",
+            "route_options": [],
+            "timeouts": null
+          },
+          "sensitive_attributes": [],
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjozMDAwMDAwMDAwMDAsImRlbGV0ZSI6MzAwMDAwMDAwMDAwLCJ1cGRhdGUiOjMwMDAwMDAwMDAwMH19"
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "yandex_alb_load_balancer",
+      "name": "my-alb",
+      "provider": "provider[\"registry.terraform.io/yandex-cloud/yandex\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "allocation_policy": [
+              {
+                "location": [
+                  {
+                    "disable_traffic": false,
+                    "subnet_id": "e2l8528ilbhuto2g3akm",
+                    "zone_id": "ru-central1-b"
+                  },
+                  {
+                    "disable_traffic": false,
+                    "subnet_id": "e9b84hms2uf005lud9qu",
+                    "zone_id": "ru-central1-a"
+                  }
+                ]
+              }
+            ],
+            "created_at": "2024-12-27T19:40:25Z",
+            "description": "ALB",
+            "folder_id": "b1g3smh02jd80g1ltb4k",
+            "id": "ds7sh81k51dv1gf7j2s7",
+            "labels": null,
+            "listener": [
+              {
+                "endpoint": [
+                  {
+                    "address": [
+                      {
+                        "external_ipv4_address": [
+                          {
+                            "address": "51.250.37.210"
+                          }
+                        ],
+                        "external_ipv6_address": [],
+                        "internal_ipv4_address": []
+                      }
+                    ],
+                    "ports": [
+                      80
+                    ]
+                  }
+                ],
+                "http": [
+                  {
+                    "handler": [
+                      {
+                        "allow_http10": false,
+                        "http2_options": [],
+                        "http_router_id": "ds74nv640ntuabfkv9fo",
+                        "rewrite_request_id": false
+                      }
+                    ],
+                    "redirects": []
+                  }
+                ],
+                "name": "my-listener",
+                "stream": [],
+                "tls": []
+              }
+            ],
+            "log_group_id": "",
+            "log_options": [],
+            "name": "project-alb",
+            "network_id": "enp39o3ka7o836srb15b",
+            "region_id": "",
+            "security_group_ids": null,
+            "status": "active",
+            "timeouts": null
+          },
+          "sensitive_attributes": [],
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjo2MDAwMDAwMDAwMDAsImRlbGV0ZSI6NjAwMDAwMDAwMDAwLCJ1cGRhdGUiOjYwMDAwMDAwMDAwMH19",
+          "dependencies": [
+            "yandex_alb_http_router.my_http_router",
+            "yandex_vpc_network.default",
+            "yandex_vpc_subnet.subnet_a",
+            "yandex_vpc_subnet.subnet_b"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "yandex_alb_target_group",
+      "name": "my_target_group",
+      "provider": "provider[\"registry.terraform.io/yandex-cloud/yandex\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "created_at": "2024-12-27T19:40:43Z",
+            "description": "ALB:Целевая группа",
+            "folder_id": "b1g3smh02jd80g1ltb4k",
+            "id": "ds7sd4rfep7gbams4urc",
+            "labels": null,
+            "name": "project-web-target-group",
+            "target": [
+              {
+                "ip_address": "10.128.0.11",
+                "private_ipv4_address": false,
+                "subnet_id": "e9b84hms2uf005lud9qu"
+              },
+              {
+                "ip_address": "10.129.0.11",
+                "private_ipv4_address": false,
+                "subnet_id": "e2l8528ilbhuto2g3akm"
+              }
+            ],
+            "timeouts": null
+          },
+          "sensitive_attributes": [],
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjozMDAwMDAwMDAwMDAsImRlbGV0ZSI6MzAwMDAwMDAwMDAwLCJ1cGRhdGUiOjMwMDAwMDAwMDAwMH19",
+          "dependencies": [
+            "yandex_compute_disk.disk_grafana",
+            "yandex_compute_disk.disk_web_1",
+            "yandex_compute_disk.disk_web_2",
+            "yandex_compute_instance.vm_grafana",
+            "yandex_compute_instance.vm_web_1",
+            "yandex_compute_instance.vm_web_2",
+            "yandex_vpc_network.default",
+            "yandex_vpc_security_group.sg_web",
+            "yandex_vpc_subnet.subnet_a",
+            "yandex_vpc_subnet.subnet_b"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "yandex_alb_virtual_host",
+      "name": "my_virtual_host",
+      "provider": "provider[\"registry.terraform.io/yandex-cloud/yandex\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "authority": null,
+            "http_router_id": "ds74nv640ntuabfkv9fo",
+            "id": "ds74nv640ntuabfkv9fo/project-vhost",
+            "modify_request_headers": [],
+            "modify_response_headers": [],
+            "name": "project-vhost",
+            "rate_limit": [],
+            "route": [
+              {
+                "grpc_route": [],
+                "http_route": [
+                  {
+                    "direct_response_action": [],
+                    "http_match": [],
+                    "http_route_action": [
+                      {
+                        "auto_host_rewrite": false,
+                        "backend_group_id": "ds7knve1dvgf5r74cvpg",
+                        "host_rewrite": "",
+                        "idle_timeout": "",
+                        "prefix_rewrite": "",
+                        "rate_limit": [],
+                        "timeout": "1m0s",
+                        "upgrade_types": null
+                      }
+                    ],
+                    "redirect_action": []
+                  }
+                ],
+                "name": "project-route",
+                "route_options": []
+              }
+            ],
+            "route_options": [],
+            "timeouts": null
+          },
+          "sensitive_attributes": [],
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjozMDAwMDAwMDAwMDAsImRlbGV0ZSI6MzAwMDAwMDAwMDAwLCJ1cGRhdGUiOjMwMDAwMDAwMDAwMH19",
+          "dependencies": [
+            "yandex_alb_backend_group.my_backend_group",
+            "yandex_alb_http_router.my_http_router",
+            "yandex_alb_target_group.my_target_group",
+            "yandex_compute_disk.disk_grafana",
+            "yandex_compute_disk.disk_web_1",
+            "yandex_compute_disk.disk_web_2",
+            "yandex_compute_instance.vm_grafana",
+            "yandex_compute_instance.vm_web_1",
+            "yandex_compute_instance.vm_web_2",
+            "yandex_vpc_network.default",
+            "yandex_vpc_security_group.sg_web",
+            "yandex_vpc_subnet.subnet_a",
+            "yandex_vpc_subnet.subnet_b"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "yandex_compute_disk",
+      "name": "disk_elastic",
+      "provider": "provider[\"registry.terraform.io/yandex-cloud/yandex\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "allow_recreate": null,
+            "block_size": 4096,
+            "created_at": "2024-12-27T19:29:48Z",
+            "description": "",
+            "disk_placement_policy": [
+              {
+                "disk_placement_group_id": ""
+              }
+            ],
+            "folder_id": "b1g3smh02jd80g1ltb4k",
+            "hardware_generation": [
+              {
+                "generation2_features": [],
+                "legacy_features": [
+                  {
+                    "pci_topology": "PCI_TOPOLOGY_V1"
+                  }
+                ]
+              }
+            ],
+            "id": "fhmalp7t765j1h153kiv",
+            "image_id": "fd83u9thmahrv9lgedrk",
+            "kms_key_id": null,
+            "labels": {},
+            "name": "disk-elastic",
+            "product_ids": [
+              "f2e1eht8hm1mgq4fmk1k"
+            ],
+            "size": 8,
+            "snapshot_id": "",
+            "status": "ready",
+            "timeouts": null,
+            "type": "network-hdd",
+            "zone": "ru-central1-a"
+          },
+          "sensitive_attributes": [],
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjozMDAwMDAwMDAwMDAsImRlbGV0ZSI6MzAwMDAwMDAwMDAwLCJ1cGRhdGUiOjMwMDAwMDAwMDAwMH19"
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "yandex_compute_disk",
+      "name": "disk_grafana",
+      "provider": "provider[\"registry.terraform.io/yandex-cloud/yandex\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "allow_recreate": null,
+            "block_size": 4096,
+            "created_at": "2024-12-27T19:29:47Z",
+            "description": "",
+            "disk_placement_policy": [
+              {
+                "disk_placement_group_id": ""
+              }
+            ],
+            "folder_id": "b1g3smh02jd80g1ltb4k",
+            "hardware_generation": [
+              {
+                "generation2_features": [],
+                "legacy_features": [
+                  {
+                    "pci_topology": "PCI_TOPOLOGY_V1"
+                  }
+                ]
+              }
+            ],
+            "id": "fhmt1bvh0cfhqm18rk4b",
+            "image_id": "fd83u9thmahrv9lgedrk",
+            "kms_key_id": null,
+            "labels": {},
+            "name": "disk-grafana",
+            "product_ids": [
+              "f2e1eht8hm1mgq4fmk1k"
+            ],
+            "size": 6,
+            "snapshot_id": "",
+            "status": "ready",
+            "timeouts": null,
+            "type": "network-hdd",
+            "zone": "ru-central1-a"
+          },
+          "sensitive_attributes": [],
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjozMDAwMDAwMDAwMDAsImRlbGV0ZSI6MzAwMDAwMDAwMDAwLCJ1cGRhdGUiOjMwMDAwMDAwMDAwMH19"
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "yandex_compute_disk",
+      "name": "disk_kibana",
+      "provider": "provider[\"registry.terraform.io/yandex-cloud/yandex\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "allow_recreate": null,
+            "block_size": 4096,
+            "created_at": "2024-12-27T19:29:48Z",
+            "description": "",
+            "disk_placement_policy": [
+              {
+                "disk_placement_group_id": ""
+              }
+            ],
+            "folder_id": "b1g3smh02jd80g1ltb4k",
+            "hardware_generation": [
+              {
+                "generation2_features": [],
+                "legacy_features": [
+                  {
+                    "pci_topology": "PCI_TOPOLOGY_V1"
+                  }
+                ]
+              }
+            ],
+            "id": "fhmdch371bcmt0sdvih2",
+            "image_id": "fd83u9thmahrv9lgedrk",
+            "kms_key_id": null,
+            "labels": {},
+            "name": "disk-kibana",
+            "product_ids": [
+              "f2e1eht8hm1mgq4fmk1k"
+            ],
+            "size": 8,
+            "snapshot_id": "",
+            "status": "ready",
+            "timeouts": null,
+            "type": "network-hdd",
+            "zone": "ru-central1-a"
+          },
+          "sensitive_attributes": [],
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjozMDAwMDAwMDAwMDAsImRlbGV0ZSI6MzAwMDAwMDAwMDAwLCJ1cGRhdGUiOjMwMDAwMDAwMDAwMH19"
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "yandex_compute_disk",
+      "name": "disk_prometheus",
+      "provider": "provider[\"registry.terraform.io/yandex-cloud/yandex\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "allow_recreate": null,
+            "block_size": 4096,
+            "created_at": "2024-12-27T19:29:48Z",
+            "description": "",
+            "disk_placement_policy": [
+              {
+                "disk_placement_group_id": ""
+              }
+            ],
+            "folder_id": "b1g3smh02jd80g1ltb4k",
+            "hardware_generation": [
+              {
+                "generation2_features": [],
+                "legacy_features": [
+                  {
+                    "pci_topology": "PCI_TOPOLOGY_V1"
+                  }
+                ]
+              }
+            ],
+            "id": "fhm1rh3dt6u6e54gp4mg",
+            "image_id": "fd83u9thmahrv9lgedrk",
+            "kms_key_id": null,
+            "labels": {},
+            "name": "disk-prometheus",
+            "product_ids": [
+              "f2e1eht8hm1mgq4fmk1k"
+            ],
+            "size": 6,
+            "snapshot_id": "",
+            "status": "ready",
+            "timeouts": null,
+            "type": "network-hdd",
+            "zone": "ru-central1-a"
+          },
+          "sensitive_attributes": [],
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjozMDAwMDAwMDAwMDAsImRlbGV0ZSI6MzAwMDAwMDAwMDAwLCJ1cGRhdGUiOjMwMDAwMDAwMDAwMH19"
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "yandex_compute_disk",
+      "name": "disk_web_1",
+      "provider": "provider[\"registry.terraform.io/yandex-cloud/yandex\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "allow_recreate": null,
+            "block_size": 4096,
+            "created_at": "2024-12-27T19:29:48Z",
+            "description": "",
+            "disk_placement_policy": [
+              {
+                "disk_placement_group_id": ""
+              }
+            ],
+            "folder_id": "b1g3smh02jd80g1ltb4k",
+            "hardware_generation": [
+              {
+                "generation2_features": [],
+                "legacy_features": [
+                  {
+                    "pci_topology": "PCI_TOPOLOGY_V1"
+                  }
+                ]
+              }
+            ],
+            "id": "fhmbojbdudd9em54sooe",
+            "image_id": "fd83u9thmahrv9lgedrk",
+            "kms_key_id": null,
+            "labels": {},
+            "name": "disk-web1",
+            "product_ids": [
+              "f2e1eht8hm1mgq4fmk1k"
+            ],
+            "size": 3,
+            "snapshot_id": "",
+            "status": "ready",
+            "timeouts": null,
+            "type": "network-hdd",
+            "zone": "ru-central1-a"
+          },
+          "sensitive_attributes": [],
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjozMDAwMDAwMDAwMDAsImRlbGV0ZSI6MzAwMDAwMDAwMDAwLCJ1cGRhdGUiOjMwMDAwMDAwMDAwMH19"
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "yandex_compute_disk",
+      "name": "disk_web_2",
+      "provider": "provider[\"registry.terraform.io/yandex-cloud/yandex\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "allow_recreate": null,
+            "block_size": 4096,
+            "created_at": "2024-12-27T19:29:48Z",
+            "description": "",
+            "disk_placement_policy": [
+              {
+                "disk_placement_group_id": ""
+              }
+            ],
+            "folder_id": "b1g3smh02jd80g1ltb4k",
+            "hardware_generation": [
+              {
+                "generation2_features": [],
+                "legacy_features": [
+                  {
+                    "pci_topology": "PCI_TOPOLOGY_V1"
+                  }
+                ]
+              }
+            ],
+            "id": "epdfgs0usgu3umgfph2r",
+            "image_id": "fd83u9thmahrv9lgedrk",
+            "kms_key_id": null,
+            "labels": {},
+            "name": "disk-web2",
+            "product_ids": [
+              "f2e1eht8hm1mgq4fmk1k"
+            ],
+            "size": 3,
+            "snapshot_id": "",
+            "status": "ready",
+            "timeouts": null,
+            "type": "network-hdd",
+            "zone": "ru-central1-b"
+          },
+          "sensitive_attributes": [],
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjozMDAwMDAwMDAwMDAsImRlbGV0ZSI6MzAwMDAwMDAwMDAwLCJ1cGRhdGUiOjMwMDAwMDAwMDAwMH19"
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "yandex_compute_instance",
+      "name": "vm_elastic",
+      "provider": "provider[\"registry.terraform.io/yandex-cloud/yandex\"]",
+      "instances": [
+        {
+          "schema_version": 1,
+          "attributes": {
+            "allow_recreate": null,
+            "allow_stopping_for_update": true,
+            "boot_disk": [
+              {
+                "auto_delete": true,
+                "device_name": "fhmalp7t765j1h153kiv",
+                "disk_id": "fhmalp7t765j1h153kiv",
+                "initialize_params": [
+                  {
+                    "block_size": 4096,
+                    "description": "",
+                    "image_id": "fd83u9thmahrv9lgedrk",
+                    "kms_key_id": "",
+                    "name": "disk-elastic",
+                    "size": 8,
+                    "snapshot_id": "",
+                    "type": "network-hdd"
+                  }
+                ],
+                "mode": "READ_WRITE"
+              }
+            ],
+            "created_at": "2024-12-27T19:29:59Z",
+            "description": "",
+            "filesystem": [],
+            "folder_id": "b1g3smh02jd80g1ltb4k",
+            "fqdn": "debian-vm-elastic.ru-central1.internal",
+            "gpu_cluster_id": "",
+            "hardware_generation": [
+              {
+                "generation2_features": [],
+                "legacy_features": [
+                  {
+                    "pci_topology": "PCI_TOPOLOGY_V1"
+                  }
+                ]
+              }
+            ],
+            "hostname": "debian-vm-elastic",
+            "id": "fhm8oeqbbti347012o3p",
+            "labels": {},
+            "local_disk": [],
+            "maintenance_grace_period": "",
+            "maintenance_policy": null,
+            "metadata": {
+              "ssh-keys": "yc-user:ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPni+n1QcIIto6Us+Rq+8Eu+KRp73uGoDhZigSvgvCxw vikeltor@compute-vm-2-2-10-hdd-1735043319359\n",
+              "user-data": "#cloud-config\ndatasource:\n Ec2:\n  strict_id: false\nssh_pwauth: no\nusers:\n- name: yc-user\n  sudo: ALL=(ALL) NOPASSWD:ALL\n  shell: /bin/bash\n  ssh_authorized_keys:\n  - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPni+n1QcIIto6Us+Rq+8Eu+KRp73uGoDhZigSvgvCxw vikeltor@compute-vm-2-2-10-hdd-1735043319359"
+            },
+            "metadata_options": [
+              {
+                "aws_v1_http_endpoint": 1,
+                "aws_v1_http_token": 2,
+                "gce_http_endpoint": 1,
+                "gce_http_token": 1
+              }
+            ],
+            "name": "vm-elastic",
+            "network_acceleration_type": "standard",
+            "network_interface": [
+              {
+                "dns_record": [],
+                "index": 0,
+                "ip_address": "10.128.0.31",
+                "ipv4": true,
+                "ipv6": false,
+                "ipv6_address": "",
+                "ipv6_dns_record": [],
+                "mac_address": "d0:0d:8c:3b:4b:5f",
+                "nat": false,
+                "nat_dns_record": [],
+                "nat_ip_address": "",
+                "nat_ip_version": "",
+                "security_group_ids": [
+                  "enp7g7afm3bsfv9jq0q3"
+                ],
+                "subnet_id": "e9b84hms2uf005lud9qu"
+              }
+            ],
+            "placement_policy": [
+              {
+                "host_affinity_rules": [],
+                "placement_group_id": "",
+                "placement_group_partition": 0
+              }
+            ],
+            "platform_id": "standard-v1",
+            "resources": [
+              {
+                "core_fraction": 20,
+                "cores": 2,
+                "gpus": 0,
+                "memory": 4
+              }
+            ],
+            "scheduling_policy": [
+              {
+                "preemptible": true
+              }
+            ],
+            "secondary_disk": [],
+            "service_account_id": "",
+            "status": "running",
+            "timeouts": null,
+            "zone": "ru-central1-a"
+          },
+          "sensitive_attributes": [],
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjozMDAwMDAwMDAwMDAsImRlbGV0ZSI6MzAwMDAwMDAwMDAwLCJ1cGRhdGUiOjMwMDAwMDAwMDAwMH0sInNjaGVtYV92ZXJzaW9uIjoiMSJ9",
+          "dependencies": [
+            "yandex_compute_disk.disk_elastic",
+            "yandex_compute_disk.disk_grafana",
+            "yandex_compute_instance.vm_grafana",
+            "yandex_vpc_network.default",
+            "yandex_vpc_security_group.sg_elastic",
+            "yandex_vpc_subnet.subnet_a"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "yandex_compute_instance",
+      "name": "vm_grafana",
+      "provider": "provider[\"registry.terraform.io/yandex-cloud/yandex\"]",
+      "instances": [
+        {
+          "schema_version": 1,
+          "attributes": {
+            "allow_recreate": null,
+            "allow_stopping_for_update": true,
+            "boot_disk": [
+              {
+                "auto_delete": true,
+                "device_name": "fhmt1bvh0cfhqm18rk4b",
+                "disk_id": "fhmt1bvh0cfhqm18rk4b",
+                "initialize_params": [
+                  {
+                    "block_size": 4096,
+                    "description": "",
+                    "image_id": "fd83u9thmahrv9lgedrk",
+                    "kms_key_id": "",
+                    "name": "disk-grafana",
+                    "size": 6,
+                    "snapshot_id": "",
+                    "type": "network-hdd"
+                  }
+                ],
+                "mode": "READ_WRITE"
+              }
+            ],
+            "created_at": "2024-12-27T19:30:04Z",
+            "description": "",
+            "filesystem": [],
+            "folder_id": "b1g3smh02jd80g1ltb4k",
+            "fqdn": "debian-vm-grafana.ru-central1.internal",
+            "gpu_cluster_id": "",
+            "hardware_generation": [
+              {
+                "generation2_features": [],
+                "legacy_features": [
+                  {
+                    "pci_topology": "PCI_TOPOLOGY_V1"
+                  }
+                ]
+              }
+            ],
+            "hostname": "debian-vm-grafana",
+            "id": "fhml1m5ijcr0rojovh2c",
+            "labels": {},
+            "local_disk": [],
+            "maintenance_grace_period": "",
+            "maintenance_policy": null,
+            "metadata": {
+              "ssh-keys": "yc-user:ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPni+n1QcIIto6Us+Rq+8Eu+KRp73uGoDhZigSvgvCxw vikeltor@compute-vm-2-2-10-hdd-1735043319359\n",
+              "user-data": "#cloud-config\ndatasource:\n Ec2:\n  strict_id: false\nssh_pwauth: no\nusers:\n- name: yc-user\n  sudo: ALL=(ALL) NOPASSWD:ALL\n  shell: /bin/bash\n  ssh_authorized_keys:\n  - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPni+n1QcIIto6Us+Rq+8Eu+KRp73uGoDhZigSvgvCxw vikeltor@compute-vm-2-2-10-hdd-1735043319359"
+            },
+            "metadata_options": [
+              {
+                "aws_v1_http_endpoint": 1,
+                "aws_v1_http_token": 2,
+                "gce_http_endpoint": 1,
+                "gce_http_token": 1
+              }
+            ],
+            "name": "vm-grafana",
+            "network_acceleration_type": "standard",
+            "network_interface": [
+              {
+                "dns_record": [],
+                "index": 0,
+                "ip_address": "10.128.0.22",
+                "ipv4": true,
+                "ipv6": false,
+                "ipv6_address": "",
+                "ipv6_dns_record": [],
+                "mac_address": "d0:0d:15:0d:8b:29",
+                "nat": true,
+                "nat_dns_record": [],
+                "nat_ip_address": "51.250.0.93",
+                "nat_ip_version": "IPV4",
+                "security_group_ids": [],
+                "subnet_id": "e9b84hms2uf005lud9qu"
+              }
+            ],
+            "placement_policy": [
+              {
+                "host_affinity_rules": [],
+                "placement_group_id": "",
+                "placement_group_partition": 0
+              }
+            ],
+            "platform_id": "standard-v1",
+            "resources": [
+              {
+                "core_fraction": 20,
+                "cores": 2,
+                "gpus": 0,
+                "memory": 2
+              }
+            ],
+            "scheduling_policy": [
+              {
+                "preemptible": true
+              }
+            ],
+            "secondary_disk": [],
+            "service_account_id": "",
+            "status": "running",
+            "timeouts": null,
+            "zone": "ru-central1-a"
+          },
+          "sensitive_attributes": [],
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjozMDAwMDAwMDAwMDAsImRlbGV0ZSI6MzAwMDAwMDAwMDAwLCJ1cGRhdGUiOjMwMDAwMDAwMDAwMH0sInNjaGVtYV92ZXJzaW9uIjoiMSJ9",
+          "dependencies": [
+            "yandex_compute_disk.disk_grafana",
+            "yandex_vpc_network.default",
+            "yandex_vpc_subnet.subnet_a"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "yandex_compute_instance",
+      "name": "vm_kibana",
+      "provider": "provider[\"registry.terraform.io/yandex-cloud/yandex\"]",
+      "instances": [
+        {
+          "schema_version": 1,
+          "attributes": {
+            "allow_recreate": null,
+            "allow_stopping_for_update": true,
+            "boot_disk": [
+              {
+                "auto_delete": true,
+                "device_name": "fhmdch371bcmt0sdvih2",
+                "disk_id": "fhmdch371bcmt0sdvih2",
+                "initialize_params": [
+                  {
+                    "block_size": 4096,
+                    "description": "",
+                    "image_id": "fd83u9thmahrv9lgedrk",
+                    "kms_key_id": "",
+                    "name": "disk-kibana",
+                    "size": 8,
+                    "snapshot_id": "",
+                    "type": "network-hdd"
+                  }
+                ],
+                "mode": "READ_WRITE"
+              }
+            ],
+            "created_at": "2024-12-27T19:29:57Z",
+            "description": "",
+            "filesystem": [],
+            "folder_id": "b1g3smh02jd80g1ltb4k",
+            "fqdn": "debian-vm-kibana.ru-central1.internal",
+            "gpu_cluster_id": "",
+            "hardware_generation": [
+              {
+                "generation2_features": [],
+                "legacy_features": [
+                  {
+                    "pci_topology": "PCI_TOPOLOGY_V1"
+                  }
+                ]
+              }
+            ],
+            "hostname": "debian-vm-kibana",
+            "id": "fhmauk4uv4rjuljuii93",
+            "labels": {},
+            "local_disk": [],
+            "maintenance_grace_period": "",
+            "maintenance_policy": null,
+            "metadata": {
+              "ssh-keys": "yc-user:ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPni+n1QcIIto6Us+Rq+8Eu+KRp73uGoDhZigSvgvCxw vikeltor@compute-vm-2-2-10-hdd-1735043319359\n",
+              "user-data": "#cloud-config\ndatasource:\n Ec2:\n  strict_id: false\nssh_pwauth: no\nusers:\n- name: yc-user\n  sudo: ALL=(ALL) NOPASSWD:ALL\n  shell: /bin/bash\n  ssh_authorized_keys:\n  - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPni+n1QcIIto6Us+Rq+8Eu+KRp73uGoDhZigSvgvCxw vikeltor@compute-vm-2-2-10-hdd-1735043319359"
+            },
+            "metadata_options": [
+              {
+                "aws_v1_http_endpoint": 1,
+                "aws_v1_http_token": 2,
+                "gce_http_endpoint": 1,
+                "gce_http_token": 1
+              }
+            ],
+            "name": "vm-kibana",
+            "network_acceleration_type": "standard",
+            "network_interface": [
+              {
+                "dns_record": [],
+                "index": 0,
+                "ip_address": "10.128.0.32",
+                "ipv4": true,
+                "ipv6": false,
+                "ipv6_address": "",
+                "ipv6_dns_record": [],
+                "mac_address": "d0:0d:af:50:9e:f9",
+                "nat": true,
+                "nat_dns_record": [],
+                "nat_ip_address": "51.250.66.130",
+                "nat_ip_version": "IPV4",
+                "security_group_ids": [
+                  "enpglo8jaokkks6dknac"
+                ],
+                "subnet_id": "e9b84hms2uf005lud9qu"
+              }
+            ],
+            "placement_policy": [
+              {
+                "host_affinity_rules": [],
+                "placement_group_id": "",
+                "placement_group_partition": 0
+              }
+            ],
+            "platform_id": "standard-v1",
+            "resources": [
+              {
+                "core_fraction": 20,
+                "cores": 2,
+                "gpus": 0,
+                "memory": 4
+              }
+            ],
+            "scheduling_policy": [
+              {
+                "preemptible": true
+              }
+            ],
+            "secondary_disk": [],
+            "service_account_id": "",
+            "status": "running",
+            "timeouts": null,
+            "zone": "ru-central1-a"
+          },
+          "sensitive_attributes": [],
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjozMDAwMDAwMDAwMDAsImRlbGV0ZSI6MzAwMDAwMDAwMDAwLCJ1cGRhdGUiOjMwMDAwMDAwMDAwMH0sInNjaGVtYV92ZXJzaW9uIjoiMSJ9",
+          "dependencies": [
+            "yandex_compute_disk.disk_grafana",
+            "yandex_compute_disk.disk_kibana",
+            "yandex_compute_instance.vm_grafana",
+            "yandex_vpc_network.default",
+            "yandex_vpc_security_group.sg_kibana",
+            "yandex_vpc_subnet.subnet_a"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "yandex_compute_instance",
+      "name": "vm_prometheus",
+      "provider": "provider[\"registry.terraform.io/yandex-cloud/yandex\"]",
+      "instances": [
+        {
+          "schema_version": 1,
+          "attributes": {
+            "allow_recreate": null,
+            "allow_stopping_for_update": true,
+            "boot_disk": [
+              {
+                "auto_delete": true,
+                "device_name": "fhm1rh3dt6u6e54gp4mg",
+                "disk_id": "fhm1rh3dt6u6e54gp4mg",
+                "initialize_params": [
+                  {
+                    "block_size": 4096,
+                    "description": "",
+                    "image_id": "fd83u9thmahrv9lgedrk",
+                    "kms_key_id": "",
+                    "name": "disk-prometheus",
+                    "size": 6,
+                    "snapshot_id": "",
+                    "type": "network-hdd"
+                  }
+                ],
+                "mode": "READ_WRITE"
+              }
+            ],
+            "created_at": "2024-12-27T19:29:57Z",
+            "description": "",
+            "filesystem": [],
+            "folder_id": "b1g3smh02jd80g1ltb4k",
+            "fqdn": "debian-vm-prometheus.ru-central1.internal",
+            "gpu_cluster_id": "",
+            "hardware_generation": [
+              {
+                "generation2_features": [],
+                "legacy_features": [
+                  {
+                    "pci_topology": "PCI_TOPOLOGY_V1"
+                  }
+                ]
+              }
+            ],
+            "hostname": "debian-vm-prometheus",
+            "id": "fhm5u14r6c3hvshd8net",
+            "labels": {},
+            "local_disk": [],
+            "maintenance_grace_period": "",
+            "maintenance_policy": null,
+            "metadata": {
+              "ssh-keys": "yc-user:ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPni+n1QcIIto6Us+Rq+8Eu+KRp73uGoDhZigSvgvCxw vikeltor@compute-vm-2-2-10-hdd-1735043319359\n",
+              "user-data": "#cloud-config\ndatasource:\n Ec2:\n  strict_id: false\nssh_pwauth: no\nusers:\n- name: yc-user\n  sudo: ALL=(ALL) NOPASSWD:ALL\n  shell: /bin/bash\n  ssh_authorized_keys:\n  - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPni+n1QcIIto6Us+Rq+8Eu+KRp73uGoDhZigSvgvCxw vikeltor@compute-vm-2-2-10-hdd-1735043319359"
+            },
+            "metadata_options": [
+              {
+                "aws_v1_http_endpoint": 1,
+                "aws_v1_http_token": 2,
+                "gce_http_endpoint": 1,
+                "gce_http_token": 1
+              }
+            ],
+            "name": "vm-prometheus",
+            "network_acceleration_type": "standard",
+            "network_interface": [
+              {
+                "dns_record": [],
+                "index": 0,
+                "ip_address": "10.128.0.21",
+                "ipv4": true,
+                "ipv6": false,
+                "ipv6_address": "",
+                "ipv6_dns_record": [],
+                "mac_address": "d0:0d:5f:04:9b:33",
+                "nat": true,
+                "nat_dns_record": [],
+                "nat_ip_address": "89.169.144.252",
+                "nat_ip_version": "IPV4",
+                "security_group_ids": [],
+                "subnet_id": "e9b84hms2uf005lud9qu"
+              }
+            ],
+            "placement_policy": [
+              {
+                "host_affinity_rules": [],
+                "placement_group_id": "",
+                "placement_group_partition": 0
+              }
+            ],
+            "platform_id": "standard-v1",
+            "resources": [
+              {
+                "core_fraction": 20,
+                "cores": 2,
+                "gpus": 0,
+                "memory": 2
+              }
+            ],
+            "scheduling_policy": [
+              {
+                "preemptible": true
+              }
+            ],
+            "secondary_disk": [],
+            "service_account_id": "",
+            "status": "running",
+            "timeouts": null,
+            "zone": "ru-central1-a"
+          },
+          "sensitive_attributes": [],
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjozMDAwMDAwMDAwMDAsImRlbGV0ZSI6MzAwMDAwMDAwMDAwLCJ1cGRhdGUiOjMwMDAwMDAwMDAwMH0sInNjaGVtYV92ZXJzaW9uIjoiMSJ9",
+          "dependencies": [
+            "yandex_compute_disk.disk_prometheus",
+            "yandex_vpc_network.default",
+            "yandex_vpc_subnet.subnet_a"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "yandex_compute_instance",
+      "name": "vm_web_1",
+      "provider": "provider[\"registry.terraform.io/yandex-cloud/yandex\"]",
+      "instances": [
+        {
+          "schema_version": 1,
+          "attributes": {
+            "allow_recreate": null,
+            "allow_stopping_for_update": true,
+            "boot_disk": [
+              {
+                "auto_delete": true,
+                "device_name": "fhmbojbdudd9em54sooe",
+                "disk_id": "fhmbojbdudd9em54sooe",
+                "initialize_params": [
+                  {
+                    "block_size": 4096,
+                    "description": "",
+                    "image_id": "fd83u9thmahrv9lgedrk",
+                    "kms_key_id": "",
+                    "name": "disk-web1",
+                    "size": 3,
+                    "snapshot_id": "",
+                    "type": "network-hdd"
+                  }
+                ],
+                "mode": "READ_WRITE"
+              }
+            ],
+            "created_at": "2024-12-27T19:30:00Z",
+            "description": "",
+            "filesystem": [],
+            "folder_id": "b1g3smh02jd80g1ltb4k",
+            "fqdn": "debian-vm-web1.ru-central1.internal",
+            "gpu_cluster_id": "",
+            "hardware_generation": [
+              {
+                "generation2_features": [],
+                "legacy_features": [
+                  {
+                    "pci_topology": "PCI_TOPOLOGY_V1"
+                  }
+                ]
+              }
+            ],
+            "hostname": "debian-vm-web1",
+            "id": "fhmpj7nl83gmj6fjp6f5",
+            "labels": {},
+            "local_disk": [],
+            "maintenance_grace_period": "",
+            "maintenance_policy": null,
+            "metadata": {
+              "ssh-keys": "yc-user:ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPni+n1QcIIto6Us+Rq+8Eu+KRp73uGoDhZigSvgvCxw vikeltor@compute-vm-2-2-10-hdd-1735043319359\n",
+              "user-data": "#cloud-config\ndatasource:\n Ec2:\n  strict_id: false\nssh_pwauth: no\nusers:\n- name: yc-user\n  sudo: ALL=(ALL) NOPASSWD:ALL\n  shell: /bin/bash\n  ssh_authorized_keys:\n  - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPni+n1QcIIto6Us+Rq+8Eu+KRp73uGoDhZigSvgvCxw vikeltor@compute-vm-2-2-10-hdd-1735043319359"
+            },
+            "metadata_options": [
+              {
+                "aws_v1_http_endpoint": 1,
+                "aws_v1_http_token": 2,
+                "gce_http_endpoint": 1,
+                "gce_http_token": 1
+              }
+            ],
+            "name": "vm-web1",
+            "network_acceleration_type": "standard",
+            "network_interface": [
+              {
+                "dns_record": [],
+                "index": 0,
+                "ip_address": "10.128.0.11",
+                "ipv4": true,
+                "ipv6": false,
+                "ipv6_address": "",
+                "ipv6_dns_record": [],
+                "mac_address": "d0:0d:19:99:ef:54",
+                "nat": false,
+                "nat_dns_record": [],
+                "nat_ip_address": "",
+                "nat_ip_version": "",
+                "security_group_ids": [
+                  "enp39lbgsnlmfoeekgu7"
+                ],
+                "subnet_id": "e9b84hms2uf005lud9qu"
+              }
+            ],
+            "placement_policy": [
+              {
+                "host_affinity_rules": [],
+                "placement_group_id": "",
+                "placement_group_partition": 0
+              }
+            ],
+            "platform_id": "standard-v1",
+            "resources": [
+              {
+                "core_fraction": 20,
+                "cores": 2,
+                "gpus": 0,
+                "memory": 1
+              }
+            ],
+            "scheduling_policy": [
+              {
+                "preemptible": true
+              }
+            ],
+            "secondary_disk": [],
+            "service_account_id": "",
+            "status": "running",
+            "timeouts": null,
+            "zone": "ru-central1-a"
+          },
+          "sensitive_attributes": [],
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjozMDAwMDAwMDAwMDAsImRlbGV0ZSI6MzAwMDAwMDAwMDAwLCJ1cGRhdGUiOjMwMDAwMDAwMDAwMH0sInNjaGVtYV92ZXJzaW9uIjoiMSJ9",
+          "dependencies": [
+            "yandex_compute_disk.disk_grafana",
+            "yandex_compute_disk.disk_web_1",
+            "yandex_compute_instance.vm_grafana",
+            "yandex_vpc_network.default",
+            "yandex_vpc_security_group.sg_web",
+            "yandex_vpc_subnet.subnet_a"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "yandex_compute_instance",
+      "name": "vm_web_2",
+      "provider": "provider[\"registry.terraform.io/yandex-cloud/yandex\"]",
+      "instances": [
+        {
+          "schema_version": 1,
+          "attributes": {
+            "allow_recreate": null,
+            "allow_stopping_for_update": true,
+            "boot_disk": [
+              {
+                "auto_delete": true,
+                "device_name": "epdfgs0usgu3umgfph2r",
+                "disk_id": "epdfgs0usgu3umgfph2r",
+                "initialize_params": [
+                  {
+                    "block_size": 4096,
+                    "description": "",
+                    "image_id": "fd83u9thmahrv9lgedrk",
+                    "kms_key_id": "",
+                    "name": "disk-web2",
+                    "size": 3,
+                    "snapshot_id": "",
+                    "type": "network-hdd"
+                  }
+                ],
+                "mode": "READ_WRITE"
+              }
+            ],
+            "created_at": "2024-12-27T19:30:01Z",
+            "description": "",
+            "filesystem": [],
+            "folder_id": "b1g3smh02jd80g1ltb4k",
+            "fqdn": "debian-vm-web2.ru-central1.internal",
+            "gpu_cluster_id": "",
+            "hardware_generation": [
+              {
+                "generation2_features": [],
+                "legacy_features": [
+                  {
+                    "pci_topology": "PCI_TOPOLOGY_V1"
+                  }
+                ]
+              }
+            ],
+            "hostname": "debian-vm-web2",
+            "id": "epdrhlald114gnicbb0j",
+            "labels": {},
+            "local_disk": [],
+            "maintenance_grace_period": "",
+            "maintenance_policy": null,
+            "metadata": {
+              "ssh-keys": "yc-user:ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPni+n1QcIIto6Us+Rq+8Eu+KRp73uGoDhZigSvgvCxw vikeltor@compute-vm-2-2-10-hdd-1735043319359\n",
+              "user-data": "#cloud-config\ndatasource:\n Ec2:\n  strict_id: false\nssh_pwauth: no\nusers:\n- name: yc-user\n  sudo: ALL=(ALL) NOPASSWD:ALL\n  shell: /bin/bash\n  ssh_authorized_keys:\n  - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPni+n1QcIIto6Us+Rq+8Eu+KRp73uGoDhZigSvgvCxw vikeltor@compute-vm-2-2-10-hdd-1735043319359"
+            },
+            "metadata_options": [
+              {
+                "aws_v1_http_endpoint": 1,
+                "aws_v1_http_token": 2,
+                "gce_http_endpoint": 1,
+                "gce_http_token": 1
+              }
+            ],
+            "name": "vm-web2",
+            "network_acceleration_type": "standard",
+            "network_interface": [
+              {
+                "dns_record": [],
+                "index": 0,
+                "ip_address": "10.129.0.11",
+                "ipv4": true,
+                "ipv6": false,
+                "ipv6_address": "",
+                "ipv6_dns_record": [],
+                "mac_address": "d0:0d:1b:8d:55:56",
+                "nat": false,
+                "nat_dns_record": [],
+                "nat_ip_address": "",
+                "nat_ip_version": "",
+                "security_group_ids": [
+                  "enp39lbgsnlmfoeekgu7"
+                ],
+                "subnet_id": "e2l8528ilbhuto2g3akm"
+              }
+            ],
+            "placement_policy": [
+              {
+                "host_affinity_rules": [],
+                "placement_group_id": "",
+                "placement_group_partition": 0
+              }
+            ],
+            "platform_id": "standard-v1",
+            "resources": [
+              {
+                "core_fraction": 20,
+                "cores": 2,
+                "gpus": 0,
+                "memory": 1
+              }
+            ],
+            "scheduling_policy": [
+              {
+                "preemptible": true
+              }
+            ],
+            "secondary_disk": [],
+            "service_account_id": "",
+            "status": "running",
+            "timeouts": null,
+            "zone": "ru-central1-b"
+          },
+          "sensitive_attributes": [],
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjozMDAwMDAwMDAwMDAsImRlbGV0ZSI6MzAwMDAwMDAwMDAwLCJ1cGRhdGUiOjMwMDAwMDAwMDAwMH0sInNjaGVtYV92ZXJzaW9uIjoiMSJ9",
+          "dependencies": [
+            "yandex_compute_disk.disk_grafana",
+            "yandex_compute_disk.disk_web_2",
+            "yandex_compute_instance.vm_grafana",
+            "yandex_vpc_network.default",
+            "yandex_vpc_security_group.sg_web",
+            "yandex_vpc_subnet.subnet_a",
+            "yandex_vpc_subnet.subnet_b"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "yandex_compute_snapshot_schedule",
+      "name": "project_snapshot_schedule",
+      "provider": "provider[\"registry.terraform.io/yandex-cloud/yandex\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "created_at": "2024-12-27T19:40:46Z",
+            "description": "Ежедневные снимки. Срок хранения снимков 7 дней",
+            "disk_ids": [
+              "epdfgs0usgu3umgfph2r",
+              "fhm1rh3dt6u6e54gp4mg",
+              "fhmalp7t765j1h153kiv",
+              "fhmbojbdudd9em54sooe",
+              "fhmdch371bcmt0sdvih2",
+              "fhmt1bvh0cfhqm18rk4b"
+            ],
+            "folder_id": "b1g3smh02jd80g1ltb4k",
+            "id": "fd84fml95k7mpsfiffdv",
+            "labels": null,
+            "name": "project-snapshot-schedule",
+            "retention_period": "168h0m0s",
+            "schedule_policy": [
+              {
+                "expression": "10 0 ? * *",
+                "start_at": "1970-01-01T00:00:00Z"
+              }
+            ],
+            "snapshot_count": 0,
+            "snapshot_spec": [
+              {
+                "description": "retention-snapshot",
+                "labels": null
+              }
+            ],
+            "status": "active",
+            "timeouts": null
+          },
+          "sensitive_attributes": [],
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjozMDAwMDAwMDAwMDAsImRlbGV0ZSI6MzAwMDAwMDAwMDAwLCJ1cGRhdGUiOjMwMDAwMDAwMDAwMH19",
+          "dependencies": [
+            "yandex_compute_disk.disk_elastic",
+            "yandex_compute_disk.disk_grafana",
+            "yandex_compute_disk.disk_kibana",
+            "yandex_compute_disk.disk_prometheus",
+            "yandex_compute_disk.disk_web_1",
+            "yandex_compute_disk.disk_web_2",
+            "yandex_compute_instance.vm_elastic",
+            "yandex_compute_instance.vm_grafana",
+            "yandex_compute_instance.vm_kibana",
+            "yandex_compute_instance.vm_prometheus",
+            "yandex_compute_instance.vm_web_1",
+            "yandex_compute_instance.vm_web_2",
+            "yandex_vpc_network.default",
+            "yandex_vpc_security_group.sg_elastic",
+            "yandex_vpc_security_group.sg_kibana",
+            "yandex_vpc_security_group.sg_web",
+            "yandex_vpc_subnet.subnet_a",
+            "yandex_vpc_subnet.subnet_b"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "yandex_vpc_network",
+      "name": "default",
+      "provider": "provider[\"registry.terraform.io/yandex-cloud/yandex\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "created_at": "2024-12-27T15:47:30Z",
+            "default_security_group_id": "enp2uiipgj1nigrtqpmt",
+            "description": "",
+            "folder_id": "b1g3smh02jd80g1ltb4k",
+            "id": "enp39o3ka7o836srb15b",
+            "labels": {},
+            "name": "default",
+            "subnet_ids": [
+              "e2l8528ilbhuto2g3akm",
+              "e9b84hms2uf005lud9qu",
+              "fl8rvr0pe9d042sjvnrq"
+            ],
+            "timeouts": null
+          },
+          "sensitive_attributes": [],
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjo2MDAwMDAwMDAwMCwiZGVsZXRlIjo2MDAwMDAwMDAwMCwidXBkYXRlIjo2MDAwMDAwMDAwMH19"
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "yandex_vpc_security_group",
+      "name": "sg_elastic",
+      "provider": "provider[\"registry.terraform.io/yandex-cloud/yandex\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "created_at": "2024-12-27T19:01:21Z",
+            "description": "SG для Elasticsearch",
+            "egress": [
+              {
+                "description": "to internal Kibana from Elasticsearch",
+                "from_port": -1,
+                "id": "enp2l4ik1um8e49gfjrf",
+                "labels": {},
+                "port": 5601,
+                "predefined_target": "",
+                "protocol": "TCP",
+                "security_group_id": "",
+                "to_port": -1,
+                "v4_cidr_blocks": [
+                  "10.128.0.0/16",
+                  "10.129.0.0/16"
+                ],
+                "v6_cidr_blocks": []
+              }
+            ],
+            "folder_id": "b1g3smh02jd80g1ltb4k",
+            "id": "enp7g7afm3bsfv9jq0q3",
+            "ingress": [
+              {
+                "description": "from internal Grafana to SSH",
+                "from_port": -1,
+                "id": "enpmja86n6tp9fvujk9e",
+                "labels": {},
+                "port": 22,
+                "predefined_target": "",
+                "protocol": "TCP",
+                "security_group_id": "",
+                "to_port": -1,
+                "v4_cidr_blocks": [
+                  "10.128.0.22/32"
+                ],
+                "v6_cidr_blocks": []
+              },
+              {
+                "description": "from internal to Elasticsearc",
+                "from_port": -1,
+                "id": "enpp1aiq5qem25d4dolr",
+                "labels": {},
+                "port": 9200,
+                "predefined_target": "",
+                "protocol": "TCP",
+                "security_group_id": "",
+                "to_port": -1,
+                "v4_cidr_blocks": [
+                  "10.128.0.0/16",
+                  "10.129.0.0/16"
+                ],
+                "v6_cidr_blocks": []
+              }
+            ],
+            "labels": {},
+            "name": "sg-elastic",
+            "network_id": "enp39o3ka7o836srb15b",
+            "status": "ACTIVE",
+            "timeouts": null
+          },
+          "sensitive_attributes": [],
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjoxODAwMDAwMDAwMDAsImRlbGV0ZSI6MTgwMDAwMDAwMDAwLCJ1cGRhdGUiOjE4MDAwMDAwMDAwMH19",
+          "dependencies": [
+            "yandex_compute_disk.disk_grafana",
+            "yandex_compute_instance.vm_grafana",
+            "yandex_vpc_network.default",
+            "yandex_vpc_subnet.subnet_a"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "yandex_vpc_security_group",
+      "name": "sg_grafana",
+      "provider": "provider[\"registry.terraform.io/yandex-cloud/yandex\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "created_at": "2024-12-27T19:01:07Z",
+            "description": "SG для Grafana + Bastion Host",
+            "egress": [
+              {
+                "description": "to internal Elasticsearch from Filebeat",
+                "from_port": -1,
+                "id": "enpqnqi5e6enuelqvtgi",
+                "labels": {},
+                "port": 9200,
+                "predefined_target": "",
+                "protocol": "TCP",
+                "security_group_id": "",
+                "to_port": -1,
+                "v4_cidr_blocks": [
+                  "10.128.0.0/16"
+                ],
+                "v6_cidr_blocks": []
+              },
+              {
+                "description": "to internal Prometheus from Grafana",
+                "from_port": -1,
+                "id": "enp5c5bqam7tt5pjamd1",
+                "labels": {},
+                "port": 9090,
+                "predefined_target": "",
+                "protocol": "TCP",
+                "security_group_id": "",
+                "to_port": -1,
+                "v4_cidr_blocks": [
+                  "10.128.0.0/16"
+                ],
+                "v6_cidr_blocks": []
+              },
+              {
+                "description": "to internal VM SSH from Grafana",
+                "from_port": -1,
+                "id": "enph10m0a1do1t4n0bqn",
+                "labels": {},
+                "port": 22,
+                "predefined_target": "",
+                "protocol": "TCP",
+                "security_group_id": "",
+                "to_port": -1,
+                "v4_cidr_blocks": [
+                  "10.128.0.0/16",
+                  "10.129.0.0/16",
+                  "10.130.0.0/16"
+                ],
+                "v6_cidr_blocks": []
+              }
+            ],
+            "folder_id": "b1g3smh02jd80g1ltb4k",
+            "id": "enpoa383cim4rnns1gka",
+            "ingress": [
+              {
+                "description": "in Grafana GUI",
+                "from_port": -1,
+                "id": "enplg7fdntruj9b3l8g6",
+                "labels": {},
+                "port": 3000,
+                "predefined_target": "",
+                "protocol": "TCP",
+                "security_group_id": "",
+                "to_port": -1,
+                "v4_cidr_blocks": [
+                  "0.0.0.0/0"
+                ],
+                "v6_cidr_blocks": []
+              },
+              {
+                "description": "in Grafana SSH",
+                "from_port": -1,
+                "id": "enpne6cg9krq9mde32ir",
+                "labels": {},
+                "port": 22,
+                "predefined_target": "",
+                "protocol": "TCP",
+                "security_group_id": "",
+                "to_port": -1,
+                "v4_cidr_blocks": [
+                  "0.0.0.0/0"
+                ],
+                "v6_cidr_blocks": []
+              }
+            ],
+            "labels": {},
+            "name": "sg-grafana",
+            "network_id": "enp39o3ka7o836srb15b",
+            "status": "ACTIVE",
+            "timeouts": null
+          },
+          "sensitive_attributes": [],
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjoxODAwMDAwMDAwMDAsImRlbGV0ZSI6MTgwMDAwMDAwMDAwLCJ1cGRhdGUiOjE4MDAwMDAwMDAwMH19",
+          "dependencies": [
+            "yandex_vpc_network.default"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "yandex_vpc_security_group",
+      "name": "sg_kibana",
+      "provider": "provider[\"registry.terraform.io/yandex-cloud/yandex\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "created_at": "2024-12-27T19:01:13Z",
+            "description": "SG для Kibana",
+            "egress": [
+              {
+                "description": "to internal Elasticsearch from Filebeat",
+                "from_port": -1,
+                "id": "enpdsd0o381ie5k4rm6f",
+                "labels": {},
+                "port": 9200,
+                "predefined_target": "",
+                "protocol": "TCP",
+                "security_group_id": "",
+                "to_port": -1,
+                "v4_cidr_blocks": [
+                  "10.128.0.0/16"
+                ],
+                "v6_cidr_blocks": []
+              },
+              {
+                "description": "to internal Elasticsearch from Kibana",
+                "from_port": -1,
+                "id": "enp5etcnfbs6l3hmn9ri",
+                "labels": {},
+                "port": 9200,
+                "predefined_target": "",
+                "protocol": "TCP",
+                "security_group_id": "",
+                "to_port": -1,
+                "v4_cidr_blocks": [
+                  "10.128.0.0/16",
+                  "10.129.0.0/16"
+                ],
+                "v6_cidr_blocks": []
+              }
+            ],
+            "folder_id": "b1g3smh02jd80g1ltb4k",
+            "id": "enpglo8jaokkks6dknac",
+            "ingress": [
+              {
+                "description": "from internal Grafana to SSH",
+                "from_port": -1,
+                "id": "enpbajaitn3timbts0u5",
+                "labels": {},
+                "port": 22,
+                "predefined_target": "",
+                "protocol": "TCP",
+                "security_group_id": "",
+                "to_port": -1,
+                "v4_cidr_blocks": [
+                  "10.128.0.22/32"
+                ],
+                "v6_cidr_blocks": []
+              },
+              {
+                "description": "in Kibana GUI",
+                "from_port": -1,
+                "id": "enp4uf88h20pa0rmk45k",
+                "labels": {},
+                "port": 5601,
+                "predefined_target": "",
+                "protocol": "TCP",
+                "security_group_id": "",
+                "to_port": -1,
+                "v4_cidr_blocks": [
+                  "0.0.0.0/0"
+                ],
+                "v6_cidr_blocks": []
+              }
+            ],
+            "labels": {},
+            "name": "sg-kibana",
+            "network_id": "enp39o3ka7o836srb15b",
+            "status": "ACTIVE",
+            "timeouts": null
+          },
+          "sensitive_attributes": [],
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjoxODAwMDAwMDAwMDAsImRlbGV0ZSI6MTgwMDAwMDAwMDAwLCJ1cGRhdGUiOjE4MDAwMDAwMDAwMH19",
+          "dependencies": [
+            "yandex_compute_disk.disk_grafana",
+            "yandex_compute_instance.vm_grafana",
+            "yandex_vpc_network.default",
+            "yandex_vpc_subnet.subnet_a"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "yandex_vpc_security_group",
+      "name": "sg_prometheus",
+      "provider": "provider[\"registry.terraform.io/yandex-cloud/yandex\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "created_at": "2024-12-27T19:01:09Z",
+            "description": "SG для Prometheus",
+            "egress": [
+              {
+                "description": "to internal Elasticsearch from Filebeat",
+                "from_port": -1,
+                "id": "enpqntut266cqv0o7kul",
+                "labels": {},
+                "port": 9200,
+                "predefined_target": "",
+                "protocol": "TCP",
+                "security_group_id": "",
+                "to_port": -1,
+                "v4_cidr_blocks": [
+                  "10.128.0.0/16"
+                ],
+                "v6_cidr_blocks": []
+              },
+              {
+                "description": "to internal Nginx Log Exporter from Prometheus",
+                "from_port": -1,
+                "id": "enp63haa0jacbvt76on7",
+                "labels": {},
+                "port": 4040,
+                "predefined_target": "",
+                "protocol": "TCP",
+                "security_group_id": "",
+                "to_port": -1,
+                "v4_cidr_blocks": [
+                  "10.128.0.0/16",
+                  "10.129.0.0/16"
+                ],
+                "v6_cidr_blocks": []
+              },
+              {
+                "description": "to internal Node Exporter from Prometheus",
+                "from_port": -1,
+                "id": "enpcg8gvh8t1ftbm1cce",
+                "labels": {},
+                "port": 9100,
+                "predefined_target": "",
+                "protocol": "TCP",
+                "security_group_id": "",
+                "to_port": -1,
+                "v4_cidr_blocks": [
+                  "10.128.0.0/16",
+                  "10.129.0.0/16"
+                ],
+                "v6_cidr_blocks": []
+              }
+            ],
+            "folder_id": "b1g3smh02jd80g1ltb4k",
+            "id": "enp65m06n5ma9dkida7l",
+            "ingress": [
+              {
+                "description": "from internal Grafana to Prometheus",
+                "from_port": -1,
+                "id": "enp30ne126sme5ankpb3",
+                "labels": {},
+                "port": 9090,
+                "predefined_target": "",
+                "protocol": "TCP",
+                "security_group_id": "",
+                "to_port": -1,
+                "v4_cidr_blocks": [
+                  "10.128.0.0/16"
+                ],
+                "v6_cidr_blocks": []
+              },
+              {
+                "description": "from internal Grafana to SSH",
+                "from_port": -1,
+                "id": "enp0pq99289ctdgejkjv",
+                "labels": {},
+                "port": 22,
+                "predefined_target": "",
+                "protocol": "TCP",
+                "security_group_id": "",
+                "to_port": -1,
+                "v4_cidr_blocks": [
+                  "10.128.0.22/32"
+                ],
+                "v6_cidr_blocks": []
+              }
+            ],
+            "labels": {},
+            "name": "sg-prometheus",
+            "network_id": "enp39o3ka7o836srb15b",
+            "status": "ACTIVE",
+            "timeouts": null
+          },
+          "sensitive_attributes": [],
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjoxODAwMDAwMDAwMDAsImRlbGV0ZSI6MTgwMDAwMDAwMDAwLCJ1cGRhdGUiOjE4MDAwMDAwMDAwMH19",
+          "dependencies": [
+            "yandex_compute_disk.disk_grafana",
+            "yandex_compute_instance.vm_grafana",
+            "yandex_vpc_network.default",
+            "yandex_vpc_subnet.subnet_a"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "yandex_vpc_security_group",
+      "name": "sg_web",
+      "provider": "provider[\"registry.terraform.io/yandex-cloud/yandex\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "created_at": "2024-12-27T19:01:11Z",
+            "description": "SG для WEB",
+            "egress": [
+              {
+                "description": "to internal Elasticsearch from Filebeat",
+                "from_port": -1,
+                "id": "enpsscj7tna18l57dgb8",
+                "labels": {},
+                "port": 9200,
+                "predefined_target": "",
+                "protocol": "TCP",
+                "security_group_id": "",
+                "to_port": -1,
+                "v4_cidr_blocks": [
+                  "10.128.0.0/16"
+                ],
+                "v6_cidr_blocks": []
+              }
+            ],
+            "folder_id": "b1g3smh02jd80g1ltb4k",
+            "id": "enp39lbgsnlmfoeekgu7",
+            "ingress": [
+              {
+                "description": "from internal Grafana to SSH",
+                "from_port": -1,
+                "id": "enpha6ccm6hau5e7aap5",
+                "labels": {},
+                "port": 22,
+                "predefined_target": "",
+                "protocol": "TCP",
+                "security_group_id": "",
+                "to_port": -1,
+                "v4_cidr_blocks": [
+                  "10.128.0.22/32"
+                ],
+                "v6_cidr_blocks": []
+              },
+              {
+                "description": "from internal to metrics nginxlog-exporter",
+                "from_port": -1,
+                "id": "enp01mminb9h907k9kpu",
+                "labels": {},
+                "port": 4040,
+                "predefined_target": "",
+                "protocol": "TCP",
+                "security_group_id": "",
+                "to_port": -1,
+                "v4_cidr_blocks": [
+                  "10.128.0.0/16",
+                  "10.129.0.0/16"
+                ],
+                "v6_cidr_blocks": []
+              },
+              {
+                "description": "from internal to metrics node-exporter",
+                "from_port": -1,
+                "id": "enpmso8o8s9t7ophknh6",
+                "labels": {},
+                "port": 9100,
+                "predefined_target": "",
+                "protocol": "TCP",
+                "security_group_id": "",
+                "to_port": -1,
+                "v4_cidr_blocks": [
+                  "10.128.0.0/16",
+                  "10.129.0.0/16"
+                ],
+                "v6_cidr_blocks": []
+              },
+              {
+                "description": "in web server",
+                "from_port": -1,
+                "id": "enp14v40dcrokd0d0d5j",
+                "labels": {},
+                "port": 80,
+                "predefined_target": "",
+                "protocol": "TCP",
+                "security_group_id": "",
+                "to_port": -1,
+                "v4_cidr_blocks": [
+                  "0.0.0.0/0"
+                ],
+                "v6_cidr_blocks": []
+              },
+              {
+                "description": "loadbalancer healthchecks",
+                "from_port": -1,
+                "id": "enpb4fe351r9ghb13hau",
+                "labels": {},
+                "port": -1,
+                "predefined_target": "loadbalancer_healthchecks",
+                "protocol": "ANY",
+                "security_group_id": "",
+                "to_port": -1,
+                "v4_cidr_blocks": [],
+                "v6_cidr_blocks": []
+              }
+            ],
+            "labels": {},
+            "name": "sg-web",
+            "network_id": "enp39o3ka7o836srb15b",
+            "status": "ACTIVE",
+            "timeouts": null
+          },
+          "sensitive_attributes": [],
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjoxODAwMDAwMDAwMDAsImRlbGV0ZSI6MTgwMDAwMDAwMDAwLCJ1cGRhdGUiOjE4MDAwMDAwMDAwMH19",
+          "dependencies": [
+            "yandex_compute_disk.disk_grafana",
+            "yandex_compute_instance.vm_grafana",
+            "yandex_vpc_network.default",
+            "yandex_vpc_subnet.subnet_a"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "yandex_vpc_subnet",
+      "name": "subnet_a",
+      "provider": "provider[\"registry.terraform.io/yandex-cloud/yandex\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "created_at": "2024-12-27T15:47:32Z",
+            "description": "",
+            "dhcp_options": [],
+            "folder_id": "b1g3smh02jd80g1ltb4k",
+            "id": "e9b84hms2uf005lud9qu",
+            "labels": {},
+            "name": "default-ru-central1-a",
+            "network_id": "enp39o3ka7o836srb15b",
+            "route_table_id": "",
+            "timeouts": null,
+            "v4_cidr_blocks": [
+              "10.128.0.0/24"
+            ],
+            "v6_cidr_blocks": [],
+            "zone": "ru-central1-a"
+          },
+          "sensitive_attributes": [],
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjoxODAwMDAwMDAwMDAsImRlbGV0ZSI6MTgwMDAwMDAwMDAwLCJ1cGRhdGUiOjE4MDAwMDAwMDAwMH19",
+          "dependencies": [
+            "yandex_vpc_network.default"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "yandex_vpc_subnet",
+      "name": "subnet_b",
+      "provider": "provider[\"registry.terraform.io/yandex-cloud/yandex\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "created_at": "2024-12-27T15:47:33Z",
+            "description": "",
+            "dhcp_options": [],
+            "folder_id": "b1g3smh02jd80g1ltb4k",
+            "id": "e2l8528ilbhuto2g3akm",
+            "labels": {},
+            "name": "default-ru-central1-b",
+            "network_id": "enp39o3ka7o836srb15b",
+            "route_table_id": "",
+            "timeouts": null,
+            "v4_cidr_blocks": [
+              "10.129.0.0/24"
+            ],
+            "v6_cidr_blocks": [],
+            "zone": "ru-central1-b"
+          },
+          "sensitive_attributes": [],
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjoxODAwMDAwMDAwMDAsImRlbGV0ZSI6MTgwMDAwMDAwMDAwLCJ1cGRhdGUiOjE4MDAwMDAwMDAwMH19",
+          "dependencies": [
+            "yandex_vpc_network.default"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "yandex_vpc_subnet",
+      "name": "subnet_d",
+      "provider": "provider[\"registry.terraform.io/yandex-cloud/yandex\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "created_at": "2024-12-27T15:47:32Z",
+            "description": "",
+            "dhcp_options": [],
+            "folder_id": "b1g3smh02jd80g1ltb4k",
+            "id": "fl8rvr0pe9d042sjvnrq",
+            "labels": {},
+            "name": "default-ru-central1-d",
+            "network_id": "enp39o3ka7o836srb15b",
+            "route_table_id": "",
+            "timeouts": null,
+            "v4_cidr_blocks": [
+              "10.130.0.0/24"
+            ],
+            "v6_cidr_blocks": [],
+            "zone": "ru-central1-d"
+          },
+          "sensitive_attributes": [],
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjoxODAwMDAwMDAwMDAsImRlbGV0ZSI6MTgwMDAwMDAwMDAwLCJ1cGRhdGUiOjE4MDAwMDAwMDAwMH19",
+          "dependencies": [
+            "yandex_vpc_network.default"
+          ]
+        }
+      ]
+    }
+  ],
+  "check_results": null
+}

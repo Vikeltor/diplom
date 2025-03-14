@@ -1,0 +1,374 @@
+#!/bin/bash
+#
+
+#Скрипт разворачивания облачной инфраструктуры в Yandex Cloud
+#c использованием Terraform
+
+
+LOGS_VM1_NAME=vm-elastic
+LOGS_VM2_NAME=vm-kibana
+INT_IP_ELASTIC=10.128.0.31 #Elasticsearch
+INT_IP_KIBANA=10.128.0.32 #Kibana
+
+WEB_VM1_NAME=vm-web1
+WEB_VM2_NAME=vm-web2
+IP_INT_WEB1=10.128.0.11
+IP_INT_WEB2=10.129.0.11
+
+MONS_VM1_NAME=vm-prometheus
+MONS_VM2_NAME=vm-grafana
+VM1_INT_IP=10.128.0.21 # Prometheus
+VM2_INT_IP=10.128.0.22 # Grafana + Bastion
+
+
+########################################################################
+#Создание виртуального частного облака (Virtual Private Cloud):
+# - Создание каталога (Folder)
+# - Создание сети (Network) и подсети (Subnet)
+# - Создание ВМ
+########################################################################
+
+echo "########################################################################
+#Создание виртуального частного облака (Virtual Private Cloud):
+# - Создание каталога (Folder)
+# - Создание сети (Network) и подсети (Subnet)
+# - Создание ВМ
+########################################################################"
+
+#
+export YC_TOKEN=$(yc iam create-token)
+export YC_CLOUD_ID=$(yc config get cloud-id)
+export YC_FOLDER_ID=$(yc config get folder-id)
+
+#
+cd ~/diplom/terraform
+#terraform init
+if [ $? -ne 0 ]; then
+    echo "ОШИБКА выполнения terraform init"
+    exit 1
+fi
+
+# 1. Разворачиваем VPC и виртуальные машины (terraform)
+
+# 1.1. Подготовка
+cp -f ~/diplom/terraform/log-collection/main_log-collection.tf ~/diplom/terraform/
+cp -f ~/diplom/terraform/website/main_website.tf ~/diplom/terraform/
+cp -f ~/diplom/terraform/monitoring/main_monitoring.tf ~/diplom/terraform/
+
+rm -f ~/diplom/terraform/yc-sg.tf
+rm -f ~/diplom/terraform/alb.tf
+rm -f ~/diplom/terraform/yc_snapshot_schedule.tf 
+
+ls -latrh  ~/diplom/terraform/*.tf
+
+# 1.2. Разворачивание
+terraform plan
+if [ $? -ne 0 ]; then
+    echo "ОШИБКА выполнения terraform plan"
+    exit 1
+fi
+
+terraform apply -auto-approve
+if [ $? -ne 0 ]; then
+    echo "ОШИБКА выполнения terraform apply"
+    exit 1
+fi
+
+
+########################################################################
+#Создание целевых сервисов внутри виртуальных машин
+########################################################################
+
+echo "########################################################################
+#Создание целевых сервисов внутри виртуальных машин
+########################################################################"
+
+# 2. Поднимаем на ВМ сервисы (ansible)
+
+# 2.1. Заполняем файл инвентаря host
+
+echo "Заполняем файл инвентаря ~/diplom/ansible/hosts"
+echo [logs] > ~/diplom/ansible/hosts
+#Ожидаем публикации IP создаваемых ВМ LOGS
+echo "Ожидаем публикации IP создаваемых ВМ: $LOGS_VM1_NAME и $LOGS_VM2_NAME"
+for VM_NAME in $LOGS_VM1_NAME $LOGS_VM2_NAME
+do
+    VM_IP=""
+    until [ -n "$VM_IP" ]
+    do
+        VM_IP=$(yc compute instance get $VM_NAME |grep -iE "^[ ]{8}address: " |sed 's/address://' |xargs)
+        if [ -n "$VM_IP" ]; then
+            echo "$VM_NAME ansible_host=$VM_IP ansible_connection=ssh ansible_ssh_user=yc-user" >> ~/diplom/ansible/hosts
+            if [ "$VM_NAME" = "$LOGS_VM1_NAME" ]; then IP_ELASTIC=$VM_IP; fi
+            if [ "$VM_NAME" = "$LOGS_VM2_NAME" ]; then IP_KIBANA=$VM_IP; fi
+        fi
+        sleep 2
+    done
+done
+
+echo [web] >> ~/diplom/ansible/hosts
+#Ожидаем публикации IP создаваемых ВМ WEB
+echo "Ожидаем публикации IP создаваемых ВМ: $WEB_VM1_NAME и $WEB_VM2_NAME"
+for VM_NAME in $WEB_VM1_NAME $WEB_VM2_NAME
+do
+    VM_IP=""
+    until [ -n "$VM_IP" ]
+    do
+        VM_IP=$(yc compute instance get $VM_NAME |grep -iE "^[ ]{8}address: " |sed 's/address://' |xargs)
+        if [ -n "$VM_IP" ]; then
+            echo "$VM_NAME ansible_host=$VM_IP ansible_connection=ssh ansible_ssh_user=yc-user" >> ~/diplom/ansible/hosts
+            if [ "$VM_NAME" = "$WEB_VM1_NAME" ]; then IP_WEB1=$VM_IP; fi
+            if [ "$VM_NAME" = "$WEB_VM2_NAME" ]; then IP_WEB2=$VM_IP; fi
+        fi
+        sleep 2
+    done
+done
+
+echo [mons] >> ~/diplom/ansible/hosts
+#Ожидаем публикации IP создаваемых ВМ MONS
+echo "Ожидаем публикации IP создаваемых ВМ: $MONS_VM1_NAME и $MONS_VM2_NAME"
+for VM_NAME in $MONS_VM1_NAME $MONS_VM2_NAME
+do
+    VM_IP=""
+    until [ -n "$VM_IP" ]
+    do
+        VM_IP=$(yc compute instance get $VM_NAME |grep -iE "^[ ]{8}address: " |sed 's/address://' |xargs)
+        if [ -n "$VM_IP" ]; then
+            echo "$VM_NAME ansible_host=$VM_IP ansible_connection=ssh ansible_ssh_user=yc-user" >> ~/diplom/ansible/hosts
+            if [ "$VM_NAME" = "$MONS_VM1_NAME" ]; then IP_PROMET=$VM_IP; fi
+            if [ "$VM_NAME" = "$MONS_VM2_NAME" ]; then IP_GRAFAN=$VM_IP; fi
+        fi
+        sleep 2
+    done
+done
+
+yc compute instance list
+
+# 2.2. Редактируем конфиг файлы сервисов
+
+#Перезаписываем конфигурационный файл kibana.yml
+echo "server.port: 5601
+server.host: \"0.0.0.0\"" > ~/diplom/logs/kibana/kibana.yml
+echo "elasticsearch.hosts: [\"http://$INT_IP_ELASTIC:9200\"]" >> ~/diplom/logs/kibana/kibana.yml
+echo "server.publicBaseUrl: \"http://$IP_KIBANA:5601/\"
+elasticsearch.username: \"kibana_system\"
+elasticsearch.password: \"Elastic123\"" >> ~/diplom/logs/kibana/kibana.yml
+
+#Перезаписываем конфигурационный файл filebeat.yml (filebeat_grafana.yml, filebeat_kibana.yml, filebeat_prometheus.yml)
+echo "filebeat.inputs:
+#- type: filestream
+#  id: my-filestream-id
+#  enabled: false
+#  paths:
+#    - /var/log/*.log
+- type: filestream
+  id: nginx-filestream-id
+  enabled: true
+  paths:
+    - /var/log/nginx/*.log
+
+# ============================== Filebeat modules ==============================
+filebeat.config.modules:
+  path: \${path.config}/modules.d/*.yml
+  reload.enabled: false
+
+# ======================= Elasticsearch template setting =======================
+setup.template.settings:
+  index.number_of_shards: 1
+
+# ================================= Dashboards =================================
+setup.dashboards.enabled: true
+
+# =================================== Kibana ===================================
+setup.kibana:" > ~/diplom/logs/filebeat/filebeat.yml
+
+echo "  host: \"http://$INT_IP_KIBANA:5601\"
+" >> ~/diplom/logs/filebeat/filebeat.yml
+
+echo "# ================================== Outputs ===================================
+
+# ---------------------------- Elasticsearch Output ----------------------------
+output.elasticsearch:" >> ~/diplom/logs/filebeat/filebeat.yml
+
+echo "  hosts: [\"$INT_IP_ELASTIC:9200\"]" >> ~/diplom/logs/filebeat/filebeat.yml
+
+echo "  username: \"elastic\"
+  password: \"Elastic123\"
+
+# ================================= Processors =================================
+processors:
+  - add_host_metadata:
+      when.not.contains.tags: forwarded
+  - add_cloud_metadata: ~
+  - add_docker_metadata: ~
+  - add_kubernetes_metadata: ~
+
+# ============================= X-Pack Monitoring ==============================
+monitoring.enabled: true
+
+# =============================== HTTP Endpoint ================================
+http.enabled: true
+http.host: localhost
+http.port: 5066
+" >> ~/diplom/logs/filebeat/filebeat.yml
+
+#Редактируем html файл index.nginx-debian.html
+echo "$(cat ~/diplom/web/WWW/index.nginx-debian.html |awk '/http:\/\/localhost:80\//{exit 0}{print $0}')" > ~/diplom/web/WWW/index.nginx-debian-web1.html
+cp -f ~/diplom/web/WWW/index.nginx-debian-web1.html ~/diplom/web/WWW/index.nginx-debian-web2.html
+
+echo "<p><b><center><a href=\"http://$IP_WEB2:80/\">Switch to another WEB server</a></center></b></p>
+<p><em>#############################################################</em></p>
+
+<p><u>IP Address Nginx Server:</u> <b><font size=\"+2\" color=\"#ff0000\"><!--#echo var=\"SERVER_ADDR\"--></font></b></br>
+<u>Name Nginx Server:</u> <b><font size=\"+2\" color=\"#ff0000\"><!--#echo var=\"HOSTNAME\"--></font></b></p>
+<p><em><center><!--#echo var=\"DATE_LOCAL\"--></center></em></p>
+
+
+</body>
+</html>
+" >> ~/diplom/web/WWW/index.nginx-debian-web1.html
+
+echo "<p><b><center><a href=\"http://$IP_WEB1:80/\">Switch to another WEB server</a></center></b></p>
+<p><em>#############################################################</em></p>
+
+<p><u>IP Address Nginx Server:</u> <b><font size=\"+2\" color=\"#ff0000\"><!--#echo var=\"SERVER_ADDR\"--></font></b></br>
+<u>Name Nginx Server:</u> <b><font size=\"+2\" color=\"#ff0000\"><!--#echo var=\"HOSTNAME\"--></font></b></p>
+<p><em><center><!--#echo var=\"DATE_LOCAL\"--></center></em></p>
+
+
+</body>
+</html>
+" >> ~/diplom/web/WWW/index.nginx-debian-web2.html
+
+#Перезаписываем конфигурационный файл prometheus.yml
+echo "global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+
+rule_files:
+
+scrape_configs:
+
+  - job_name: \"web1\"
+    scrape_interval: 8s
+    static_configs:
+      - targets: ['$IP_INT_WEB1:9100', '$IP_INT_WEB1:4040']
+
+  - job_name: \"web2\"
+    scrape_interval: 8s
+    static_configs:
+      - targets: ['$IP_INT_WEB2:9100', '$IP_INT_WEB2:4040']
+" > ~/diplom/monitoring/prometheus/prometheus.yml
+
+#Дописываем конфигурационный файл prometheus.yml
+echo "$(cat ~/diplom/monitoring/prometheus/prometheus.yml |awk '/job_name: "prometheus"/{exit 0}{print $0}')" > ~/diplom/monitoring/prometheus/prometheus.yml
+echo "
+  - job_name: \"prometheus\"
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['$VM1_INT_IP:9090', '$VM1_INT_IP:9100']" >> ~/diplom/monitoring/prometheus/prometheus.yml
+
+# 2.3. Поднимаем сервисы
+
+cd ~/diplom/ansible
+
+# 2.3.1. Elasticsearch и Kibana
+echo -e "\n # Разворачиваем сервисы: Elasticsearch и Kibana \n"
+
+ansible-playbook logs.yaml
+if [ $? -ne 0 ]; then echo "ОШИБКА выполнения Ansible playbook"; exit 1; fi
+
+# 2.3.2.  web сервера
+echo -e "\n # Разворачиваем сервисы: web-сервера \n"
+
+#ansible-playbook web.yaml --extra-vars="name_web1=$WEB_VM1_NAME ip_int_web1=$IP_INT_WEB1 name_web2=$WEB_VM2_NAME ip_int_web2=$IP_INT_WEB2"
+ansible-playbook web.yaml
+if [ $? -ne 0 ]; then echo "ОШИБКА выполнения Ansible playbook"; exit 1; fi
+
+# 2.3.3. Prometheus и Grafana
+echo -e "\n # Разворачиваем сервисы: Prometheus и Grafana \n"
+
+ansible-playbook monitoring.yaml --extra-vars="ip_prom=$VM1_INT_IP"
+if [ $? -ne 0 ]; then echo "ОШИБКА выполнения Ansible playbook"; exit 1; fi
+
+
+########################################################################
+#Финишная конфигурация ВМ в рамках VPC:
+# - Создание групп безопасности (Security Group),
+# - Создание L7-балансировщика (Application Load Balancer),
+# - Освобождение неиспользуемых публичные IP адресов ВМ.
+# - 
+########################################################################
+
+echo "########################################################################
+#Финишная конфигурация ВМ в рамках VPC:
+# - Создание групп безопасности (Security Group),
+# - Создание L7-балансировщика (Application Load Balancer),
+# - Освобождение неиспользуемых публичные IP адресов ВМ.
+# - Планировщик создания снимков дисков ВМ
+########################################################################"
+
+# 3. Финишная конфигурация
+
+# 3.1. Подготовка
+
+cp -f ~/diplom/terraform/yc-security-groups/yc_sg.tf ~/diplom/terraform/
+cp -f ~/diplom/terraform/yc-security-groups/main_log-collection.tf ~/diplom/terraform/
+cp -f ~/diplom/terraform/yc-security-groups/main_website.tf ~/diplom/terraform/
+cp -f ~/diplomterraform/yc-security-groups/main_monitoring.tf ~/diplom/terraform/
+cp -f ~/diplom/terraform/yc-application-load-balancer/alb.tf ~/diplom/terraform/
+cp -f ~/diplom/terraform/yc-snapshots/yc_snapshot_schedule.tf ~/diplom/terraform/
+
+#Почему то сбрасывает значения переменных. Запускаем повторно
+export YC_TOKEN=$(yc iam create-token)
+export YC_CLOUD_ID=$(yc config get cloud-id)
+export YC_FOLDER_ID=$(yc config get folder-id)
+
+# 3.2. Разворачивание
+cd ~/diplom/terraform
+terraform plan
+if [ $? -ne 0 ]; then
+    echo "ОШИБКА выполнения terraform plan"
+    exit 1
+fi
+
+terraform apply -auto-approve
+if [ $? -ne 0 ]; then
+    echo "ОШИБКА выполнения terraform apply"
+    exit 1
+fi
+
+
+########################################################################
+#Облачная инфраструктура развернута.
+#Печатаем список созданных ресурсов.
+########################################################################
+
+echo "########################################################################
+#Облачная инфраструктура развернута.
+#Печатаем список созданных ресурсов.
+########################################################################"
+
+
+echo -e "\n # Список сетей :"
+yc vpc network list
+echo " # Список подсетей :"
+yc vpc subnet list
+
+echo " # Список созданных ВМ :"
+yc compute instance list
+
+PUB_IP_ALB=$(yc alb load-balancer get project-alb |grep -iE "^[ ]{14}address: " |awk '{print $ 2}')
+echo -e " #\n # Публичный IP адрес балансера alb : $PUB_IP_ALB \n #\n"
+
+echo "Список созданных групп безопасности :"
+yc vpc security-group list
+
+echo "Список расписаний создания снимков дисков :"
+yc compute snapshot-schedule list
+

@@ -1,0 +1,77 @@
+#!/bin/bash
+#
+
+#ssh-keygen -t ed25519
+
+#yc compute instance list
+
+#
+# Запускать после разворачивания WEB (LOGS/ELK -> WEB -> MONITORING)
+#
+
+
+MONS_VM1_NAME=vm-prometheus
+MONS_VM2_NAME=vm-grafana
+
+ZONE=ru-central1-a
+VM1_INT_IP=10.128.0.21 # Prometheus
+VM2_INT_IP=10.128.0.22 # Grafana + Bastion
+
+CPU_CORE=2
+MEMORY_SIZE=2GB
+DISK_SIZE=6 #GB
+
+#
+#Перезаписываем содержимое файла host до [mons]
+echo "$(cat ~/diplom/ansible/hosts |awk '/\[mons\]/{exit 0}{print $0}')" > ~/diplom/ansible/hosts
+echo [mons] >> ~/diplom/ansible/hosts
+
+VM_INT_IP=$VM1_INT_IP
+for VM_NAME in $MONS_VM1_NAME $MONS_VM2_NAME
+do
+    yc compute instance get $VM_NAME &>/dev/null
+    if [ $? -ne 0 ]; then
+        echo "ВМ $VM_NAME не найдена. Создаём"
+        yc compute instance create   --name $VM_NAME   --zone $ZONE   --network-interface subnet-name=default-$ZONE,nat-ip-version=ipv4,address=$VM_INT_IP  --memory $MEMORY_SIZE  --cores $CPU_CORE  --core-fraction 20  --hostname debian-$VM_NAME  --preemptible   --create-boot-disk image-folder-id=standard-images,size=$DISK_SIZE,type=network-hdd,image-family=debian-11   --ssh-key ~/.ssh/id_ed25519.pub   --async >/dev/null
+        if [ $? -ne 0 ]; then echo "ОШИБКА. ВМ $VM_NAME не создана"; exit 1; fi 
+    else
+        echo "ВМ $VM_NAME уже существует"
+    fi
+    VM_INT_IP=$VM2_INT_IP
+done
+
+#Ожидаем публикации IP создаваемых ВМ
+echo "Ожидаем публикации IP создаваемых ВМ.."
+for VM_NAME in $MONS_VM1_NAME $MONS_VM2_NAME
+do
+    VM_IP=""
+    until [ -n "$VM_IP" ]
+    do
+        VM_IP=$(yc compute instance get $VM_NAME |grep -iE "^[ ]{8}address: " |sed 's/address://' |xargs)
+        if [ -n "$VM_IP" ]; then
+            echo "$VM_NAME ansible_host=$VM_IP ansible_connection=ssh ansible_ssh_user=yc-user" >> ~/diplom/ansible/hosts
+            if [ "$VM_NAME" = "$MONS_VM1_NAME" ]; then IP_PROMET=$VM_IP; fi
+            if [ "$VM_NAME" = "$MONS_VM2_NAME" ]; then IP_GRAFAN=$VM_IP; fi
+        fi
+        sleep 2
+    done
+done
+
+yc compute instance list
+
+#Дописываем конфигурационный файл prometheus.yml
+echo "$(cat ~/diplom/monitoring/prometheus/prometheus.yml |awk '/job_name: "prometheus"/{exit 0}{print $0}')" > ~/diplom/monitoring/prometheus/prometheus.yml
+echo "
+  - job_name: \"prometheus\"
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['$VM1_INT_IP:9090', '$VM1_INT_IP:9100']" >> ~/diplom/monitoring/prometheus/prometheus.yml
+
+
+cd ~/diplom/ansible
+ansible-playbook monitoring.yaml --extra-vars="ip_prom=$VM1_INT_IP"
+if [ $? -ne 0 ]; then echo "ОШИБКА в $0. Ansible playbook ошибка выполнения сценария"; exit 1; fi
+
+
+
+

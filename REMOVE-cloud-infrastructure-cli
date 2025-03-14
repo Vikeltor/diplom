@@ -1,0 +1,171 @@
+#!/bin/bash
+#
+
+#Скрипт удаления всех ресурсов Yandex Cloud в текущем каталоге
+
+
+echo -e "\n ### ВНИМАНИЕ ! ###\n"
+echo -e " ### Планируется удаление ВСЕХ ресурсов в текущем каталоге !\n"
+CLOUD_NAME=$(yc resource-manager cloud get --id $(yc config get cloud-id) |grep -E "^name: "  |awk '{print $ 2}')
+echo -e "Каталог : $(yc config get folder-name)"
+echo -e "Облако : $CLOUD_NAME \n"
+
+read -p 'Для начала процесса удаления введите yes : ' CHOICE
+if [ "$CHOICE" != "yes" ]; then echo "Удаление не выбрано"; exit 1; fi
+
+#
+# Удаляем
+#
+
+echo -e "\nПроцесс удаление инициирован\n"
+
+#L7 load balancer
+#yc alb load-balancer list
+#yc alb load-balancer delete $(yc alb load-balancer list |awk 'NR % 2 == 0' |awk 'NR > 1' |cut -d ' ' -f 4)
+echo "L7 Load Balancers..."
+for NAME in $(yc alb load-balancer list |awk 'NR > 3' |cut -d ' ' -f 4 |head -n -2 |paste -sd ' ')
+do
+  echo "...remove L7 load balancer: $NAME"
+  yc alb load-balancer delete $NAME
+done
+yc alb load-balancer list
+
+#HTTP router
+#yc alb http-router list
+#yc alb virtual-host list --http-router-name <http_router_name>
+echo "HTTP Routers..."
+for NAME in $(yc alb http-router list |awk 'NR > 3' |cut -d ' ' -f 4 |head -n -2 |paste -sd ' ')
+do
+  echo "...remove http router: $NAME"
+  for NAME2 in $(yc alb virtual-host list --http-router-name $NAME |awk 'NR > 3' |cut -d ' ' -f 2 |head -n -2 |paste -sd ' ')
+  do
+    echo "... ...remove virtual host: $NAME2"
+    yc alb virtual-host delete $NAME2 --http-router-name $NAME
+  done
+  yc alb http-router delete $NAME
+done
+yc alb http-router list
+
+#Backend group
+#yc alb backend-group list
+echo "Backent Groups..."
+for NAME in $(yc alb backend-group list |awk 'NR > 3' |cut -d ' ' -f 4 |head -n -2 |paste -sd ' ')
+do
+  echo "...remove backend group: $NAME"
+  yc alb backend-group delete $NAME
+done
+yc alb backend-group list
+
+#Target groups
+#yc alb target-group list
+echo "Target Groups..."
+for NAME in $(yc alb target-group list |awk 'NR > 3' |cut -d ' ' -f 4 |head -n -2 |paste -sd ' ')
+do
+  echo "...remove target group: $NAME"
+  yc alb target-group delete $NAME
+done
+yc alb target-group list
+
+#yc compute instance list
+echo "Computer Instances..."
+for NAME in $(yc compute instance list |awk 'NR > 3' |cut -d ' ' -f 4 |head -n -2 |paste -sd ' ')
+do
+  echo "...remove computer instance: $NAME"
+  yc compute instance delete $NAME
+done
+yc compute instance list
+
+
+#Docker-образы
+echo "Docker-образы..."
+for NAME in $(yc container image list |awk 'NR > 3' |cut -d ' ' -f 2 |head -n -2 |paste -sd ' ')
+do
+  echo "...remove Docker-образы: $NAME"
+  yc container image delete $NAME
+done
+yc container image list
+
+#Container Registry
+echo "Container Registry..."
+for NAME in $(yc container registry list |awk 'NR > 3' |cut -d ' ' -f 4 |head -n -2 |paste -sd ' ')
+do
+  echo "...remove Container Registry: $NAME"
+  yc container registry delete $NAME
+done
+yc container registry list
+
+#Security Group
+echo "Security Group..."
+for NAME in $(yc vpc security-group list |awk 'NR > 3' |cut -d ' ' -f 4 |head -n -2 |paste -sd ' ')
+do
+  echo "...remove target group: $NAME"
+  yc vpc security-group delete $NAME
+done
+yc vpc security-group list
+
+#Snapshot-schedule
+echo "Snapshot-schedule..."
+for NAME in $(yc compute snapshot-schedule list |awk 'NR > 3' |cut -d ' ' -f 4 |head -n -2 |paste -sd ' ')
+do
+  echo "...remove snapshot-schedule: $NAME"
+  yc compute snapshot-schedule delete $NAME
+done
+yc compute snapshot-schedule list
+
+#Disk Snapshot
+echo "Disk Snapshot..."
+for NAME in $(yc compute snapshot list |awk 'NR > 3' |cut -d ' ' -f 4 |head -n -2 |paste -sd ' ')
+do
+  echo "...remove snapshot: $NAME"
+  yc compute snapshot delete $NAME
+done
+yc compute snapshot list
+
+#DNS
+echo "DNS..."
+for NAME in $(yc dns zone list |awk 'NR > 3' |cut -d ' ' -f 4 |head -n -2 |paste -sd ' ')
+do
+  echo "...remove subnet: $NAME"
+  yc dns zone delete $NAME
+done
+yc dns zone list
+
+#Subnet
+echo "Subnet..."
+for NAME in $(yc vpc subnet list |awk 'NR > 3' |cut -d ' ' -f 4 |head -n -2 |paste -sd ' ')
+do
+  echo "...remove subnet: $NAME"
+  yc vpc subnet delete $NAME
+done
+yc vpc subnet list
+
+#Network
+echo "Network..."
+for NAME in $(yc vpc network list |awk 'NR > 3' |cut -d ' ' -f 4 |head -n -2 |paste -sd ' ')
+do
+  echo "...remove network: $NAME"
+  yc vpc network delete $NAME
+done
+yc vpc network list
+
+#yc compute disk list
+echo "Computer Disk..."
+for NAME in $(yc compute disk list |awk 'NR > 3' |cut -d ' ' -f 4 |head -n -2 |paste -sd ' ')
+do
+  echo "...remove compute disk: $NAME"
+  yc compute disk delete $NAME
+done
+yc compute disk list
+
+##Folder (VPC)
+#echo "Folder (VPC)..."
+#yc resource-manager folder delete --name $(yc config get folder-name) --async &>/dev/null
+#yc vpc network get $NETWORK_NAME &>/dev/null
+#if [ $? -ne 0 ]; then
+#    echo "ОШИБКА! Каталог $(yc config get folder-name) не помечен на удаление."
+#    echo "Рекомендуется выполнить удаление каталога из консоли управления."
+#else
+#    echo "Каталог $(yc config get folder-name) помечен на удаление - PENDING_DELETION."
+#    echo "Удаление каталога можно отменить в консоли управления или удалить сразу."
+#fi
+

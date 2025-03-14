@@ -1,0 +1,8 @@
+discovery.type: single-node
+network.host: 0.0.0.0
+http.port: 9200
+path.data: /var/lib/elasticsearch
+path.logs: /var/log/elasticsearch
+bootstrap.memory_lock: true
+xpack.security.enabled: true
+xpack.license.self_generated.type: basic

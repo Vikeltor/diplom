@@ -1,0 +1,18 @@
+version: '3.7'
+
+services:
+  kibana:
+    container_name: kibana
+    image: bitnami/kibana:7.17.11
+    environment:
+      - ELASTICSEARCH_HOSTS=http://158.160.113.161:9200
+      - ELASTICSEARCH_USERNAME=kibana_system
+      - ELASTICSEARCH_PASSWORD=123kibana
+      - SERVER_HOSTS=0.0.0.0
+      - XPACK_SECURITY_ENABLED=false
+      - XPACK_MONITORING_ENABLED=false
+      - XPACK_WATCHER_ENABLED=false
+      - XPACK_ML_ENABLED=false
+    ports:
+      - 5601:5601
+

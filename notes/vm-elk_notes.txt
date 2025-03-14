@@ -1,0 +1,42 @@
+#####################
+#
+#
+
+#
+#Elasticsearch
+#
+sudo systemctl restart elasticsearch
+cd /usr/share/elasticsearch/bin/
+#sudo ./elasticsearch-certutil http
+sudo ./elasticsearch-setup-passwords interactive
+curl -u 'elastic' http://localhost:9200/_aliases
+curl -u 'kibana_system' http://158.160.40.130:5601
+
+curl -XGET 'localhost:5066/stats'
+? curl -XGET 'filebeat_IP:5066/stats'
+
+curl -u elastic -XGET '84.201.157.43:9200/_cat/indices?v'
+
+sudo journalctl -xe
+
+
+
+
+curl -X GET "elasticsearch_IP:9200/_cluster/health?pretty"
+curl kibana_IP:5601
+curl -s -I http://kibana_IP:5601 | grep -q 'HTTP/1.1 302 Found'
+
+
+
+curl -u elastic -X GET "localhost:9200/_cat/nodes?v=true&pretty"
+curl -u elastic -XGET 'localhost:9200/_cat/indices?v'
+curl -u 'elastic' http://localhost:9200/_aliases
+
+
+
+shasum -a 256 elasticsearch-7.17.11-amd64.deb
+
+
+
+Смотрим трафика на ВМ elasticsearch: 
+sudo tcpdump -i ens8 -s 1500 port 9200
