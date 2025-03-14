@@ -224,7 +224,7 @@ terraform apply -auto-approve
 ```
 
 
-**Скриншот страницы сайта ( http://158.160.173.194/:80/ )**
+**Скриншот страницы сайта ( http://158.160.176.97/:80/ )**
 
 Страница web-сайта Nginx (L7 балансировщик):
 ![Страница web-сайта Nginx / L7 балансировщик](https://github.com/Vikeltor/diplom/blob/main/README-data/img/web-site.png "Страница web-сайта Nginx / L7 балансировщик")
@@ -318,7 +318,7 @@ ansible-playbook monitoring.yaml --extra-vars="ip_prom=10.128.0.21"
 ```
 
 
-**Скриншоты интерфейса Grafana ( http://158.160.119.57:3000/ )**
+**Скриншоты интерфейса Grafana ( http://158.160.113.80:3000/ )**
 
 Дашбоард с метриками от web-сервера vm-web1 (IP 10.128.0.11)
 
