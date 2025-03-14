@@ -504,16 +504,19 @@ terraform apply -auto-approve
 **Скриншот реализации Bastion Host**
 
 Список групп безопасности:
+
 ![Список групп безопасности](https://github.com/Vikeltor/diplom/blob/main/README-data/img/sg-list.png "Список групп безопасности")
 
 
 
 Группа безопасности для Kibana:
+
 ![Группа безопасности для kibana](https://github.com/Vikeltor/diplom/blob/main/README-data/img/sg-kibana.png "Группа безопасности для kibana")
 
 
 
 Скриншот реализации Bastion Host:
+
 ![Bastion Host ( 51.250.74.96:22 )](https://github.com/Vikeltor/diplom/blob/main/README-data/img/bastionhost.png "Bastion Host ( 51.250.74.96:22 )")
 
 
