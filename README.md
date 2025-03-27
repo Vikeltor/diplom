@@ -224,7 +224,7 @@ terraform apply -auto-approve
 ```
 
 
-**Скриншот страницы сайта ( http://158.160.176.97/:80/ )**
+**Скриншот страницы сайта ( http://158.160.176.97:80/ )**
 
 Страница web-сайта Nginx (L7 балансировщик):
 ![Страница web-сайта Nginx / L7 балансировщик](https://github.com/Vikeltor/diplom/blob/main/README-data/img/web-site.png "Страница web-сайта Nginx / L7 балансировщик")
