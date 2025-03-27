@@ -318,7 +318,7 @@ ansible-playbook monitoring.yaml --extra-vars="ip_prom=10.128.0.21"
 ```
 
 
-**Скриншоты интерфейса Grafana ( http://158.160.113.80:3000/ )**
+**Скриншоты интерфейса Grafana ( http://158.160.115.132:3000/ )**
 
 Дашбоард с метриками от web-сервера vm-web1 (IP 10.128.0.11)
 
@@ -388,7 +388,7 @@ ansible-playbook logs.yaml
 
 
 
-**Скриншоты интерфейса Kibana ( http://158.160.104.167:5601/ )**
+**Скриншоты интерфейса Kibana ( http://158.160.118.232:5601/ )**
 
 Логи от Elasticsearch (IP 10.128.0.31)
 ![Логи Filebeat от Elasticsearch (IP 10.128.0.31)](https://github.com/Vikeltor/diplom/blob/main/README-data/img/kibana-log-elasticsearch.png "Логи от Elasticsearch (IP 10.128.0.31)")
